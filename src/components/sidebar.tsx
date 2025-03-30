@@ -1,7 +1,12 @@
 // src/components/sidebar.tsx
 "use client"
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useInformationStore } from "@/lib/store"
@@ -20,6 +25,15 @@ const sections = [
       "Test",
       "Result",
       "Distribution List",
+    ],
+  },
+  {
+    id: "testprocedure",
+    label: "Test Procedure",
+    items: [
+      "Test Type",
+      "Test Sequence",
+      "Test Samples",
     ],
   },
 ]
@@ -43,14 +57,14 @@ export function Sidebar() {
         {sections.map((section) => (
           <AccordionItem key={section.id} value={section.id}>
             <AccordionTrigger
-  onClick={() => router.push(`/${section.id}`)}
-  className={cn(
-    "w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 cursor-pointer no-underline hover:no-underline focus:no-underline",
-    pathname === `/${section.id}` && "text-primary"
-  )}
->
-  {section.label}
-</AccordionTrigger>
+              onClick={() => router.push(`/${section.id}`)}
+              className={cn(
+                "w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 cursor-pointer no-underline hover:no-underline focus:no-underline",
+                pathname === `/${section.id}` && "text-primary"
+              )}
+            >
+              {section.label}
+            </AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-1 pl-2 text-sm">
                 {section.items.map((item) => (

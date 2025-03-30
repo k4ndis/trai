@@ -42,18 +42,15 @@ export function Sidebar() {
       <Accordion type="multiple" className="w-full">
         {sections.map((section) => (
           <AccordionItem key={section.id} value={section.id}>
-            <AccordionTrigger>
-              {/* ✅ Nur EIN Element erlaubt: <div> ersetzt alle verschachtelten Varianten */}
-              <div
-                onClick={() => router.push(`/${section.id}`)}
-                className={cn(
-                  "text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 cursor-pointer w-full text-left no-underline",
-                  pathname === `/${section.id}` && "text-primary"
-                )}
-              >
-                {section.label}
-              </div>
-            </AccordionTrigger>
+            <AccordionTrigger
+  onClick={() => router.push(`/${section.id}`)}
+  className={cn(
+    "w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 cursor-pointer no-underline hover:no-underline focus:no-underline",
+    pathname === `/${section.id}` && "text-primary"
+  )}
+>
+  {section.label}
+</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-1 pl-2 text-sm">
                 {section.items.map((item) => (
@@ -65,7 +62,7 @@ export function Sidebar() {
                       {item}
                     </button>
                     {information[item.toLowerCase().replace(/ /g, "")] && (
-                      <div className="text-muted-foreground text-xs mt-0.5">
+                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
                         {information[item.toLowerCase().replace(/ /g, "")]}
                       </div>
                     )}

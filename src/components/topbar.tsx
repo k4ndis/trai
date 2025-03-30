@@ -7,6 +7,7 @@ import { Sun, Moon, LogIn, Menu } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
@@ -18,12 +19,20 @@ export function Topbar() {
   }, [])
 
   return (
-    <div className="flex items-center justify-between border-b px-6 py-3 bg-background shadow-sm">
+    <div className="flex items-center justify-between border-b pl-1 pr-6 py-1 bg-background shadow-sm">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
         </Button>
-        <Link href="/" className="text-xl font-bold hover:text-primary transition-colors">TRAI</Link>
+        <Link href="/" className="relative w-16 h-12">
+          <Image
+            src="/logo.png"
+            alt="TRAI Logo"
+            fill
+            className="object-contain"
+            priority
+          />
+        </Link>
       </div>
       <div className="flex items-center gap-4">
         <Input

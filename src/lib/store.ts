@@ -11,7 +11,6 @@ interface InformationState {
 export const useInformationStore = create<InformationState>((set) => ({
   fields: {},
   activeSection: "",
-
   updateField: (key, value) => set((state) => ({
     fields: {
       ...state.fields,

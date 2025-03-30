@@ -2,7 +2,6 @@
 "use client"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useInformationStore } from "@/lib/store"
@@ -43,16 +42,17 @@ export function Sidebar() {
       <Accordion type="multiple" className="w-full">
         {sections.map((section) => (
           <AccordionItem key={section.id} value={section.id}>
-            <AccordionTrigger className="text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 no-underline">
-              <Link
-                href={`/${section.id}`}
+            <AccordionTrigger>
+              {/* ✅ Nur EIN Element erlaubt: <div> ersetzt alle verschachtelten Varianten */}
+              <div
+                onClick={() => router.push(`/${section.id}`)}
                 className={cn(
-                  "text-base font-semibold hover:text-primary",
+                  "text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 cursor-pointer w-full text-left no-underline",
                   pathname === `/${section.id}` && "text-primary"
                 )}
               >
                 {section.label}
-              </Link>
+              </div>
             </AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-1 pl-2 text-sm">

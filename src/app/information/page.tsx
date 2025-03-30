@@ -81,7 +81,7 @@ export default function InformationPage() {
       <div className="flex justify-end">
         <button
           onClick={() => router.push("/testprocedure")}
-          className="mt-6 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-background dark:text-white hover:bg-primary/90"
+          className="mt-6 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-black dark:text-white hover:bg-primary/90"
         >
           Continue with Test Procedure
         </button>

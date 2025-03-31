@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { X } from "lucide-react"
 
 export default function TestProcedurePage() {
   const update = useInformationStore((state) => state.updateField)
@@ -25,9 +26,9 @@ export default function TestProcedurePage() {
   const addTestSequence = () => {
     setTestSequences((prev) => [...prev, {
       id: Date.now(),
-      type: "Function Test",
+      type: "",
       temperatures: [],
-      values: "",
+      values: [],
       startDate: "",
       endDate: "",
     }])
@@ -57,16 +58,16 @@ export default function TestProcedurePage() {
     <div className="space-y-10">
       {/* Test Type Dropdown */}
       <div>
-        <Label className="mb-2 block">Test Type</Label>
+        <Label className="text-lg mb-2 block">Test Type</Label>
         <Select
           value={testType}
           onValueChange={(value) => {
             setTestType(value)
             update("testtype", value)
           }}
-          disabled={!!testType} // Sperrt das Dropdown wenn etwas gewählt wurde
+          disabled={!!testType}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Please select" />
           </SelectTrigger>
           <SelectContent>
@@ -77,21 +78,20 @@ export default function TestProcedurePage() {
         </Select>
 
         {testType && (
-          <div className="flex items-center justify-between mt-2 border rounded px-3 py-2 bg-muted text-foreground">
-            <span className="text-sm">{testType}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearTestType}
-              className="text-destructive"
-            >
-              ❌
-            </Button>
+          <div className="flex gap-2 items-center mt-2">
+            <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
+              {testType}
+              <button
+                onClick={clearTestType}
+                className="ml-2 text-destructive hover:underline"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Der Rest der Seite bleibt unverändert */}
       {/* Test Sequences */}
       <div className="space-y-4">
         <Label className="text-lg">Test Sequences</Label>
@@ -102,36 +102,217 @@ export default function TestProcedurePage() {
               <Button variant="destructive" size="sm" onClick={() => removeItem(seq.id)}>✖</Button>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Test Type</Label>
-                <select className="w-full border rounded px-2 py-1">
-                  <option>Function Test</option>
-                  <option>Preaging</option>
-                  <option>Durability</option>
-                </select>
+              <div className="col-span-2">
+                <Label className="mb-1 block">Test Type</Label>
+                <Select
+                  value={seq.type}
+                  onValueChange={(value) => {
+                    setTestSequences((prev) =>
+                      prev.map((s) =>
+                        s.id === seq.id ? { ...s, type: value } : s
+                      )
+                    )
+                  }}
+                  disabled={!!seq.type}
+                >
+                  <SelectTrigger className="w-[300px]">
+                    <SelectValue placeholder="Select test type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Function Test">Function Test</SelectItem>
+                    <SelectItem value="Preaging">Preaging</SelectItem>
+                    <SelectItem value="Durability">Durability</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {seq.type && (
+                  <div className="flex gap-2 items-center mt-2">
+                    <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
+                      {seq.type}
+                      <button
+                        onClick={() => {
+                          setTestSequences((prev) =>
+                            prev.map((s) =>
+                              s.id === seq.id ? { ...s, type: "" } : s
+                            )
+                          )
+                        }}
+                        className="ml-2 text-destructive hover:underline"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <Label className="mb-1 block">Temperatures</Label>
+                  <div className="flex gap-4">
+                    {["RT", "-40°C", "+85°C"].map(temp => (
+                      <label key={temp} className="flex items-center gap-1">
+                        <Checkbox
+                          checked={seq.temperatures.includes(temp)}
+                          disabled={seq.temperatures.includes(temp)}
+                          onCheckedChange={() => {
+                            setTestSequences((prev) =>
+                              prev.map((s) =>
+                                s.id === seq.id
+                                  ? { ...s, temperatures: [...s.temperatures, temp] }
+                                  : s
+                              )
+                            )
+                          }}
+                        /> {temp}
+                      </label>
+                    ))}
+                  </div>
+                  {seq.temperatures.length > 0 && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {seq.temperatures.map((temp: string) => (
+                        <div key={temp} className="px-3 py-1 bg-muted text-sm rounded flex items-center">
+                          {temp}
+                          <button
+                            onClick={() => {
+                              setTestSequences((prev) =>
+                                prev.map((s) =>
+                                  s.id === seq.id
+                                    ? { ...s, temperatures: s.temperatures.filter((t: string) => t !== temp) }
+                                    : s
+                                )
+                              )
+                            }}
+                            className="ml-2 text-destructive hover:underline"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4">
+                  <Label className="mb-1 block">Values</Label>
+                  <div className="flex gap-4">
+                    {["pneumatic leak proof / responsiveness", "characteristic curve / controlling characteristics"].map(val => (
+                      <label key={val} className="flex items-center gap-1">
+                        <Checkbox
+                          checked={seq.values.includes(val)}
+                          disabled={seq.values.includes(val)}
+                          onCheckedChange={() => {
+                            setTestSequences((prev) =>
+                              prev.map((s) =>
+                                s.id === seq.id
+                                  ? { ...s, values: [...s.values, val] }
+                                  : s
+                              )
+                            )
+                          }}
+                        /> {val}
+                      </label>
+                    ))}
+                  </div>
+                  {seq.values.length > 0 && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {seq.values.map((val: string) => (
+                        <div key={val} className="px-3 py-1 bg-muted text-sm rounded flex items-center">
+                          {val}
+                          <button
+                            onClick={() => {
+                              setTestSequences((prev) =>
+                                prev.map((s) =>
+                                  s.id === seq.id
+                                    ? { ...s, values: s.values.filter((v: string) => v !== val) }
+                                    : s
+                                )
+                              )
+                            }}
+                            className="ml-2 text-destructive hover:underline"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                <Label>Temperatures</Label>
+
+              <div className="col-span-2">
                 <div className="flex gap-4">
-                  {["RT", "-40°C", "+85°C"].map(temp => (
-                    <label key={temp} className="flex items-center gap-1">
-                      <Checkbox /> {temp}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <Label>Values</Label>
-                <Input placeholder="pneumatic leak proof, responsiveness..." />
-              </div>
-              <div className="flex gap-4">
-                <div>
-                  <Label>Start Date</Label>
-                  <Input type="date" />
-                </div>
-                <div>
-                  <Label>End Date</Label>
-                  <Input type="date" />
+                  <div>
+                    <Label className="mb-1 block">Start Date</Label>
+                    <Input
+                      type="date"
+                      className="w-40"
+                      value={seq.startDate}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setTestSequences((prev) =>
+                          prev.map((s) =>
+                            s.id === seq.id ? { ...s, startDate: value } : s
+                          )
+                        );
+                      }}
+                      disabled={!!seq.startDate}
+                    />
+                    {seq.startDate && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
+                          {seq.startDate}
+                          <button
+                            onClick={() => {
+                              setTestSequences((prev) =>
+                                prev.map((s) =>
+                                  s.id === seq.id ? { ...s, startDate: "" } : s
+                                )
+                              );
+                            }}
+                            className="ml-2 text-destructive hover:underline"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label className="mb-1 block">End Date</Label>
+                    <Input
+                      type="date"
+                      className="w-40"
+                      value={seq.endDate}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setTestSequences((prev) =>
+                          prev.map((s) =>
+                            s.id === seq.id ? { ...s, endDate: value } : s
+                          )
+                        );
+                      }}
+                      disabled={!!seq.endDate}
+                    />
+                    {seq.endDate && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
+                          {seq.endDate}
+                          <button
+                            onClick={() => {
+                              setTestSequences((prev) =>
+                                prev.map((s) =>
+                                  s.id === seq.id ? { ...s, endDate: "" } : s
+                                )
+                              );
+                            }}
+                            className="ml-2 text-destructive hover:underline"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

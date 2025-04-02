@@ -43,11 +43,29 @@ export function Sidebar() {
   const router = useRouter()
   const information = useInformationStore((state) => state.fields)
 
-  const handleScrollTo = (id: string) => {
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" })
-      el.focus()
+  const handleScrollTo = (id: string, sectionId: string) => {
+    if (pathname === `/${sectionId}`) {
+      setTimeout(() => {
+        const el = document.getElementById(id)
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" })
+          el.focus()
+        }
+      }, 100)
+    } else {
+      router.push(`/${sectionId}`)
+      setTimeout(() => {
+        const checkScroll = () => {
+          const el = document.getElementById(id)
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" })
+            el.focus()
+          } else {
+            requestAnimationFrame(checkScroll)
+          }
+        }
+        checkScroll()
+      }, 300)
     }
   }
 
@@ -57,20 +75,27 @@ export function Sidebar() {
         {sections.map((section) => (
           <AccordionItem key={section.id} value={section.id}>
             <AccordionTrigger
-              onClick={() => router.push(`/${section.id}`)}
+              onClick={(e) => {
+                e.stopPropagation(); // verhindert Navigation beim Pfeil
+              }}
               className={cn(
-                "w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 cursor-pointer no-underline hover:no-underline focus:no-underline",
-                pathname === `/${section.id}` && "text-primary"
+                "group w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 no-underline"
               )}
             >
-              {section.label}
+              <span
+                className="cursor-pointer w-full text-left"
+                onClick={() => router.push(`/${section.id}`)}
+              >
+                {section.label}
+              </span>
             </AccordionTrigger>
+
             <AccordionContent>
               <ul className="space-y-1 pl-2 text-sm">
                 {section.items.map((item) => (
                   <li key={item}>
                     <button
-                      onClick={() => handleScrollTo(item)}
+                      onClick={() => handleScrollTo(item, section.id)}
                       className="text-left w-full text-sm hover:bg-accent hover:text-accent-foreground rounded px-1"
                     >
                       {item}

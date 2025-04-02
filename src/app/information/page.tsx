@@ -63,7 +63,7 @@ export default function InformationPage() {
                 id={fieldId}
                 onChange={(e) => handleChange(label, e.target.value)}
                 placeholder={`Enter ${label.toLowerCase()} info`}
-                className="resize-y"
+                className="min-h-[2.5rem] resize-y overflow-hidden"
                 value={fields[fieldId] || ""}
               />
             </div>
@@ -90,7 +90,7 @@ export default function InformationPage() {
           </div>
 
           <Textarea
-            className="mt-1"
+            className="min-h-[2.5rem] resize-y overflow-hidden"
             value={distribution.join(", ")}
             readOnly
             aria-label="Selected distribution list"

@@ -42,41 +42,35 @@ interface Sample {
 }
 
 // Wiederverwendbare CheckboxGroup-Komponente
-function CheckboxGroup({
-  title,
-  options,
-  selected,
-  onAdd,
-  onRemove,
-}: {
-  title: string;
-  options: string[];
-  selected: string[];
-  onAdd: (item: string) => void;
-  onRemove: (item: string) => void;
+function CheckboxGroup({ 
+  title, 
+  options, 
+  selected, 
+  onAdd, 
+  onRemove 
+}: { 
+  title: string; 
+  options: string[]; 
+  selected: string[]; 
+  onAdd: (item: string) => void; 
+  onRemove: (item: string) => void; 
 }) {
   return (
-    <div>
-      {title && <Label className="mb-1 block">{title}</Label>}
-      
-      <div className="flex gap-4 flex-wrap mt-1">
-        {options.map(
-          (option) =>
-            !selected.includes(option) && (
-              <label key={option} className="flex items-center gap-1">
-                <Checkbox onCheckedChange={() => onAdd(option)} /> {option}
-              </label>
-            )
-        )}
+    <div className="mt-4">
+      <Label className="mb-1 block">{title}</Label>
+      <div className="flex gap-4 flex-wrap">
+        {options.map(option => (
+          !selected.includes(option) && (
+            <label key={option} className="flex items-center gap-1">
+              <Checkbox onCheckedChange={() => onAdd(option)} /> {option}
+            </label>
+          )
+        ))}
       </div>
-
       {selected.length > 0 && (
         <div className="flex gap-2 mt-2 flex-wrap">
           {selected.map((item) => (
-            <div
-              key={item}
-              className="px-3 py-1 bg-muted text-sm rounded flex items-center"
-            >
+            <div key={item} className="px-3 py-1 bg-muted text-sm rounded flex items-center">
               {item}
               <button
                 onClick={() => onRemove(item)}
@@ -91,7 +85,6 @@ function CheckboxGroup({
     </div>
   );
 }
-
 
 // DateInputWithTag-Komponente
 function DateInputWithTag({
@@ -117,7 +110,7 @@ function DateInputWithTag({
         />
       )}
       {value && (
-        <div className="flex gap-2 mt-3 flex-wrap">
+        <div className="flex gap-2 mt-2 flex-wrap">
           <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
             {value}
             <button
@@ -307,46 +300,70 @@ export default function TestProcedurePage() {
                 )}
 
                 {seq.type === "Function Test" && (
-                  <div className="flex flex-wrap gap-6 mt-4 items-start">
-                    {/* Temperatures */}
-                    <div className="min-w-[230px] flex-shrink-0">
-                      <Label className="mb-1 block">Temperatures</Label>
-                      <CheckboxGroup
-                        title=""
-                        options={["RT", "-40°C", "+85°C"]}
-                        selected={seq.temperatures}
-                        onAdd={(temp) => addItemToSequence(seq.id, "temperatures", temp)}
-                        onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
-                      />
-                    </div>
+  <div className="flex flex-wrap gap-6 mt-4 items-start">
+    <div className="min-w-[250px] flex-1">
+      <Label className="mb-1 block">Temperatures</Label>
+      <CheckboxGroup
+        title=""
+        options={["RT", "-40°C", "+85°C"]}
+        selected={seq.temperatures}
+        onAdd={(temp) => addItemToSequence(seq.id, "temperatures", temp)}
+        onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
+      />
+    </div>
+    <div className="min-w-[250px] flex-1">
+      <Label className="mb-1 block">Values</Label>
+      <CheckboxGroup
+        title=""
+        options={[
+          "pneumatic leak proof / responsiveness",
+          "characteristic curve / controlling characteristics"
+        ]}
+        selected={seq.values}
+        onAdd={(val) => addItemToSequence(seq.id, "values", val)}
+        onRemove={(val) => removeItemFromSequence(seq.id, "values", val)}
+      />
+    </div>
+    <div className="min-w-[200px]">
+      <DateInputWithTag
+        label="Start Date"
+        value={seq.startDate}
+        onChange={(value) => updateTestSequence(seq.id, "startDate", value)}
+        onClear={() => updateTestSequence(seq.id, "startDate", "")}
+      />
+    </div>
+    <div className="min-w-[200px]">
+      <DateInputWithTag
+        label="End Date"
+        value={seq.endDate}
+        onChange={(value) => updateTestSequence(seq.id, "endDate", value)}
+        onClear={() => updateTestSequence(seq.id, "endDate", "")}
+      />
+    </div>
+  </div>
+)}
+                      onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
+                    />
 
-                    {/* Values */}
-                    <div className="min-w-[250px] flex-shrink-0">
-                      <Label className="mb-1 block">Values</Label>
-                      <CheckboxGroup
-                        title=""
-                        options={[
-                          "pneumatic leak proof / responsiveness",
-                          "characteristic curve / controlling characteristics"
-                        ]}
-                        selected={seq.values}
-                        onAdd={(val) => addItemToSequence(seq.id, "values", val)}
-                        onRemove={(val) => removeItemFromSequence(seq.id, "values", val)}
-                      />
-                    </div>
+                    <CheckboxGroup
+                      title="Values"
+                      options={[
+                        "pneumatic leak proof / responsiveness",
+                        "characteristic curve / controlling characteristics"
+                      ]}
+                      selected={seq.values}
+                      onAdd={(val) => addItemToSequence(seq.id, "values", val)}
+                      onRemove={(val) => removeItemFromSequence(seq.id, "values", val)}
+                    />
 
-                    {/* Start Date */}
-                    <div className="min-w-[200px]">
+                    <div className="flex gap-4 mt-4">
                       <DateInputWithTag
                         label="Start Date"
                         value={seq.startDate}
                         onChange={(value) => updateTestSequence(seq.id, "startDate", value)}
                         onClear={() => updateTestSequence(seq.id, "startDate", "")}
                       />
-                    </div>
 
-                    {/* End Date */}
-                    <div className="min-w-[200px]">
                       <DateInputWithTag
                         label="End Date"
                         value={seq.endDate}
@@ -354,7 +371,7 @@ export default function TestProcedurePage() {
                         onClear={() => updateTestSequence(seq.id, "endDate", "")}
                       />
                     </div>
-                  </div>
+                  </>
                 )}
 
                 {seq.type === "Preaging" && (
@@ -389,33 +406,27 @@ export default function TestProcedurePage() {
                 )}
 
                 {seq.type === "Durability" && (
-                  <div className="flex flex-wrap gap-6 mt-4 items-start">
-                    {/* Temperatures */}
-                      <div className="min-w-[230px] flex-shrink-0">
-                        <Label className="mb-1 block">Temperatures</Label>
-                        <CheckboxGroup
-                          title=""
-                          options={["RT", "-40°C", "+85°C"]}
-                          selected={seq.temperatures}
-                          onAdd={(temp) => addItemToSequence(seq.id, "temperatures", temp)}
-                          onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
-                        />
-                      </div>
+                  <>
+                    {/* Durability: Temperaturen */}
+                    <CheckboxGroup
+                      title="Temperatures"
+                      options={["RT", "-40°C", "+85°C"]}
+                      selected={seq.temperatures}
+                      onAdd={(temp) => addItemToSequence(seq.id, "temperatures", temp)}
+                      onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
+                    />
 
-                    {/* Mode */}
-                    <div className="min-w-[200px] flex-shrink-0">
-                      <Label className="mb-1 block">Mode</Label>
-                      <CheckboxGroup
-                        title=""
-                        options={["Normal", "HAD"]}
-                        selected={seq.mode}
-                        onAdd={(mode) => addItemToSequence(seq.id, "mode", mode)}
-                        onRemove={(mode) => removeItemFromSequence(seq.id, "mode", mode)}
-                      />
-                    </div>
+                    {/* Durability: Mode */}
+                    <CheckboxGroup
+                      title="Mode"
+                      options={["Normal", "HAD"]}
+                      selected={seq.mode}
+                      onAdd={(mode) => addItemToSequence(seq.id, "mode", mode)}
+                      onRemove={(mode) => removeItemFromSequence(seq.id, "mode", mode)}
+                    />
 
-                    {/* Cycles */}
-                    <div className="min-w-[200px]">
+                    {/* Durability: Cycles */}
+                    <div className="mt-4">
                       <Label className="mb-1 block">Cycles</Label>
                       <Input
                         type="number"
@@ -424,7 +435,7 @@ export default function TestProcedurePage() {
                         onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
                       />
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             </div>

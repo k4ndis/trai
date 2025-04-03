@@ -222,8 +222,14 @@ export default function TestProcedurePage() {
   return (
     <div className="space-y-10">
       {/* Test Type Dropdown */}
-      <div>
+      
+      <div
+        id="testtype"
+        tabIndex={-1}
+        className="border border-gray-700 rounded-xl p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+      >
         <Label className="text-lg mb-2 block">Test Type</Label>
+
         {!testType && (
           <Select
             value={testType}
@@ -242,7 +248,7 @@ export default function TestProcedurePage() {
             </SelectContent>
           </Select>
         )}
-      
+
         {testType && (
           <div className="flex gap-4 items-center mt-2">
             <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
@@ -264,8 +270,13 @@ export default function TestProcedurePage() {
         )}
       </div>
 
+
       {/* Test Sequences */}
-      <div className="space-y-4">
+      <div
+        id="testsequence"
+        tabIndex={-1}
+        className="border border-gray-700 rounded-xl p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+      >
         <Label className="text-lg">Test Sequences</Label>
         {testSequences.map((seq, index) => (
           <div key={seq.id} className="border rounded p-4 space-y-2">
@@ -434,7 +445,11 @@ export default function TestProcedurePage() {
       </div>
 
       {/* Samples */}
-      <div className="space-y-4">
+      <div
+        id="testsamples"
+        tabIndex={-1}
+        className="border border-gray-700 rounded-xl p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+      >
         <Label className="text-lg">Test Samples</Label>
         {samples.map((sample, index) => (
           <div key={sample.id} className="border rounded p-4 space-y-2">

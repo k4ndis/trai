@@ -1,4 +1,3 @@
-// src/components/sidebar.tsx
 "use client"
 
 import {
@@ -10,6 +9,7 @@ import {
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useInformationStore } from "@/lib/store"
+import { useEffect, useState } from "react"
 
 const sections = [
   {
@@ -43,29 +43,37 @@ export function Sidebar() {
   const router = useRouter()
   const information = useInformationStore((state) => state.fields)
 
+  const [activeField, setActiveField] = useState<string | null>(null)
+
+  useEffect(() => {
+    const handle = () => {
+      const activeEl = document.activeElement as HTMLElement | null
+      if (activeEl?.id) {
+        setActiveField(activeEl.id)
+      }
+    }
+
+    window.addEventListener("focusin", handle)
+    return () => window.removeEventListener("focusin", handle)
+  }, [])
+
   const handleScrollTo = (id: string, sectionId: string) => {
+    const idNormalized = id.toLowerCase().replace(/ /g, "")
+    const scrollAndFocus = () => {
+      const el = document.getElementById(idNormalized)
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" })
+        el.focus()
+      } else {
+        requestAnimationFrame(scrollAndFocus)
+      }
+    }
+
     if (pathname === `/${sectionId}`) {
-      setTimeout(() => {
-        const el = document.getElementById(id)
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" })
-          el.focus()
-        }
-      }, 100)
+      setTimeout(scrollAndFocus, 100)
     } else {
       router.push(`/${sectionId}`)
-      setTimeout(() => {
-        const checkScroll = () => {
-          const el = document.getElementById(id)
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "center" })
-            el.focus()
-          } else {
-            requestAnimationFrame(checkScroll)
-          }
-        }
-        checkScroll()
-      }, 300)
+      setTimeout(scrollAndFocus, 500)
     }
   }
 
@@ -76,7 +84,7 @@ export function Sidebar() {
           <AccordionItem key={section.id} value={section.id}>
             <AccordionTrigger
               onClick={(e) => {
-                e.stopPropagation(); // verhindert Navigation beim Pfeil
+                e.stopPropagation()
               }}
               className={cn(
                 "group w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 no-underline"
@@ -96,7 +104,12 @@ export function Sidebar() {
                   <li key={item}>
                     <button
                       onClick={() => handleScrollTo(item, section.id)}
-                      className="text-left w-full text-sm hover:bg-accent hover:text-accent-foreground rounded px-1"
+                      className={cn(
+                        "text-left w-full text-sm rounded px-1",
+                        activeField?.toLowerCase().replace(/ /g, "") === item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
                     >
                       {item}
                     </button>

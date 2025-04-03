@@ -78,7 +78,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
+    <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
       <Accordion type="multiple" className="w-full">
         {sections.map((section) => (
           <AccordionItem key={section.id} value={section.id}>

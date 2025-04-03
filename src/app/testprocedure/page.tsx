@@ -304,15 +304,30 @@ export default function TestProcedurePage() {
                 )}
 
                 {seq.type && (
-                  <div className="flex gap-2 items-center mt-2">
-                    <div className="px-3 py-1 bg-muted text-sm rounded flex items-center">
-                      {seq.type}
-                      <button
-                        onClick={() => updateTestSequence(seq.id, "type", "")}
-                        className="ml-2 text-destructive hover:underline"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                  <div className="flex flex-wrap gap-6 items-center mt-2">
+                    <div className="flex flex-col">
+                      <Label className="mb-1 block">Test Type</Label>
+                      <div className="px-3 py-1 bg-muted text-sm rounded flex items-center w-fit">
+                        {seq.type}
+                        <button
+                          onClick={() => updateTestSequence(seq.id, "type", "")}
+                          className="ml-2 text-destructive hover:underline"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="mb-1 block">Testbench</Label>
+                      <Input
+                        placeholder="Enter testbench"
+                        value={seq.testbench}
+                        onChange={(e) =>
+                          updateTestSequence(seq.id, "testbench", e.target.value)
+                        }
+                        className="w-[200px]"
+                      />
                     </div>
                   </div>
                 )}
@@ -441,7 +456,12 @@ export default function TestProcedurePage() {
             </div>
           </div>
         ))}
-        <Button onClick={addTestSequence}>+ Add Test Sequence</Button>
+        <Button
+          onClick={addTestSequence}
+          className="text-xs px-2 py-1 rounded w-fit"
+        >
+          + Add Test Sequence
+        </Button>
       </div>
 
       {/* Samples */}
@@ -482,7 +502,13 @@ export default function TestProcedurePage() {
             </div>
           </div>
         ))}
-        <Button onClick={addSample}>+ Add Sample</Button>
+        <Button
+          onClick={addSample}
+          className="text-xs px-2 py-1 rounded w-fit"
+        >
+          + Add Sample
+        </Button>
+
       </div>
     </div>
   )

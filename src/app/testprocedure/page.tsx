@@ -318,7 +318,7 @@ export default function TestProcedurePage() {
                           onClick={() => updateTestSequence(seq.id, "type", "")}
                           className="ml-2 text-destructive hover:underline"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-6 h-6" />
                         </button>
                       </div>
                     </div>
@@ -389,34 +389,35 @@ export default function TestProcedurePage() {
                 )}
 
                 {seq.type === "Preaging" && (
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <Input
-                      placeholder="Testbench"
-                      value={seq.testbench}
-                      onChange={(e) => updateTestSequence(seq.id, "testbench", e.target.value)}
-                    />
-                    <Input
-                      placeholder="Cycles"
-                      value={seq.cycles}
-                      onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
-                    />
-                    <Input
-                      placeholder="Temperature"
-                      value={seq.temperature}
-                      onChange={(e) => updateTestSequence(seq.id, "temperature", e.target.value)}
-                    />
-                    <Input
-                      placeholder="Dwell Time"
-                      value={seq.dwelltime}
-                      onChange={(e) => updateTestSequence(seq.id, "dwelltime", e.target.value)}
-                    />
-                    <Textarea
-                      placeholder="Comment"
-                      className="col-span-2"
-                      value={seq.comment}
-                      onChange={(e) => updateTestSequence(seq.id, "comment", e.target.value)}
-                    />
-                  </div>
+                  <div className="flex flex-wrap gap-4 mt-4">
+                  
+                  <Input
+                    className="w-[150px]"
+                    placeholder="Cycles"
+                    value={seq.cycles}
+                    onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
+                  />
+                  <Input
+                    className="w-[180px]"
+                    placeholder="Temperature"
+                    value={seq.temperature}
+                    onChange={(e) => updateTestSequence(seq.id, "temperature", e.target.value)}
+                  />
+                  <Input
+                    className="w-[180px]"
+                    placeholder="Dwell Time"
+                    value={seq.dwelltime}
+                    onChange={(e) => updateTestSequence(seq.id, "dwelltime", e.target.value)}
+                  />
+                  <Input
+  className="w-[300px]"
+  placeholder="Comment"
+  value={seq.comment}
+  onChange={(e) => updateTestSequence(seq.id, "comment", e.target.value)}
+/>
+
+                </div>
+                
                 )}
 
                 {seq.type === "Durability" && (

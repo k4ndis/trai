@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { X } from "lucide-react"
+import { SampleSection } from "./SampleSection"
+
 
 // Typdefinitionen
 interface TestSequence {
@@ -257,7 +259,7 @@ export default function TestProcedurePage() {
                 onClick={clearTestType}
                 className="ml-2 text-destructive hover:underline"
               >
-                <X className="w-4 h-4" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -281,12 +283,15 @@ export default function TestProcedurePage() {
         {testSequences.map((seq, index) => (
           <div key={seq.id} className="border rounded p-4 space-y-2">
             <div className="flex justify-between">
-              <strong>TestSequence {index + 1} {seq.type && `– ${seq.type}`}</strong>
+            <strong className="text-blue-400 text-lg">
+              Sequence {index + 1} {seq.type && `– ${seq.type}`}
+            </strong>
+
               <Button variant="destructive" size="sm" onClick={() => removeItem(seq.id)}>✖</Button>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <Label className="mb-1 block">Test Type</Label>
+                
                 {!seq.type && (
                   <Select
                     value={seq.type}
@@ -464,52 +469,12 @@ export default function TestProcedurePage() {
         </Button>
       </div>
 
-      {/* Samples */}
-      <div
-        id="testsamples"
-        tabIndex={-1}
-        className="border border-gray-700 rounded-xl p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-      >
-        <Label className="text-lg">Test Samples</Label>
-        {samples.map((sample, index) => (
-          <div key={sample.id} className="border rounded p-4 space-y-2">
-            <div className="flex justify-between">
-              <strong>Sample {index + 1}</strong>
-              <Button variant="destructive" size="sm" onClick={() => removeItem(sample.id, true)}>✖</Button>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Input 
-                placeholder="Product Number" 
-                value={sample.productNumber}
-                onChange={(e) => updateSample(sample.id, "productNumber", e.target.value)}
-              />
-              <Input 
-                placeholder="Production Date" 
-                value={sample.productionDate}
-                onChange={(e) => updateSample(sample.id, "productionDate", e.target.value)}
-              />
-              <Input 
-                placeholder="Serial Number" 
-                value={sample.serialNumber}
-                onChange={(e) => updateSample(sample.id, "serialNumber", e.target.value)}
-              />
-              <Textarea 
-                placeholder="Features / Deviations" 
-                className="col-span-2"
-                value={sample.features}
-                onChange={(e) => updateSample(sample.id, "features", e.target.value)}
-              />
-            </div>
-          </div>
-        ))}
-        <Button
-          onClick={addSample}
-          className="text-xs px-2 py-1 rounded w-fit"
-        >
-          + Add Sample
-        </Button>
-
-      </div>
+      <SampleSection
+        samples={samples}
+        updateSample={updateSample}
+        addSample={addSample}
+        removeItem={removeItem}
+      />
     </div>
   )
 }

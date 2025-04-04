@@ -52,7 +52,16 @@ export default function AuthPage() {
         {mode === 'sign-in' ? 'Noch kein Konto? Registrieren' : 'Zurück zum Login'}
       </button>
 
-      {message && <p className="text-sm text-muted-foreground">{message}</p>}
+      {message && (
+  <div className={`mt-4 rounded-lg px-4 py-2 text-sm font-semibold shadow ${
+    message.startsWith('Erfolgreich')
+      ? 'border border-green-500 bg-green-100 text-green-800'
+      : 'border border-red-500 bg-red-100 text-red-800'
+  }`}>
+    {message}
+  </div>
+)}
+
     </div>
   )
 }

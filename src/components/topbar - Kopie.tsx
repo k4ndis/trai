@@ -1,3 +1,4 @@
+// src/components/topbar.tsx
 "use client"
 
 import { Input } from "@/components/ui/input"
@@ -7,28 +8,15 @@ import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { supabase } from "@/lib/supabaseClient"
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
-  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     setMounted(true)
-
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      setUser(data?.user)
-    }
-    getUser()
   }, [])
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-  }
 
   return (
     <div className="flex items-center justify-between border-b pl-1 pr-6 py-1 bg-background shadow-sm">
@@ -58,17 +46,9 @@ export function Topbar() {
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
         )}
-        {user ? (
-          <Button variant="outline" size="sm" onClick={handleSignOut}>
-            Sign Out
-          </Button>
-        ) : (
-          <Link href="/auth">
-            <Button variant="outline" size="sm">
-              <LogIn className="h-4 w-4 mr-2" /> Sign In
-            </Button>
-          </Link>
-        )}
+        <Button variant="outline" size="sm">
+          <LogIn className="h-4 w-4 mr-2" /> Sign In
+        </Button>
       </div>
     </div>
   )

@@ -5,7 +5,6 @@ import { useState, useMemo } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useInformationStore } from "@/lib/store"
 import {
@@ -149,13 +148,18 @@ export default function TestProcedurePage() {
   }, [testSequences]);
 
   // Helper function to update a test sequence
-  const updateTestSequence = (id: number, field: keyof TestSequence, value: any) => {
+  const updateTestSequence = (
+    id: number,
+    field: keyof TestSequence,
+    value: string | string[] | number
+  ) => {
     setTestSequences((prev) =>
       prev.map((seq) =>
         seq.id === id ? { ...seq, [field]: value } : seq
       )
     );
   };
+  
 
   // Helper function to update a sample
   const updateSample = (id: number, field: keyof Sample, value: string) => {

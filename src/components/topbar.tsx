@@ -8,12 +8,14 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
+import { User } from "@supabase/supabase-js"
+
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     setMounted(true)

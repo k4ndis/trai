@@ -19,16 +19,14 @@ export function Topbar() {
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
+    setMounted(true)
+
     const getUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user || null)
+      const { data } = await supabase.auth.getUser()
+      setUser(data?.user)
     }
-  
     getUser()
   }, [])
-  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()

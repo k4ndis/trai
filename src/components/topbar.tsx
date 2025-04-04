@@ -54,10 +54,10 @@ export function Topbar() {
   }
 
   const handleSave = async () => {
-    if (!user) return alert("Du bist nicht angemeldet.")
+    if (!user) return alert("You are not logged in.")
 
     const reportId = information.report // Das Feld „Report“ aus dem Store
-    if (!reportId) return alert("Bitte gib eine Report-ID an.")
+    if (!reportId) return alert("Please enter a Report ID")
 
     const { error } = await supabase.from("test_reports").upsert([
       {
@@ -70,9 +70,9 @@ export function Topbar() {
     ])
 
     if (error) {
-      alert("Fehler beim Speichern: " + error.message)
+      alert("Error while saving: " + error.message)
     } else {
-      alert("Testbericht gespeichert ✅")
+      alert("Report saved successfully ✅")
     }
   }
 
@@ -107,7 +107,7 @@ export function Topbar() {
         {user ? (
           <div className="flex items-center gap-3">
             <Button variant="default" size="sm" onClick={handleSave}>
-              Testbericht speichern
+              Save
             </Button>
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>

@@ -10,6 +10,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
 import { User } from "@supabase/supabase-js"
+import { useRouter } from "next/navigation"
 
 
 export function Topbar() {
@@ -17,6 +18,7 @@ export function Topbar() {
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
@@ -36,9 +38,9 @@ export function Topbar() {
       setUser(session?.user || null)
   
       // Nach erfolgreichem Login zur Startseite weiterleiten
-      if (session?.user) {
-        window.location.href = "/"
-      }      
+      if (_event === "SIGNED_IN") {
+        router.push("/")
+      }        
     })
   
     return () => {

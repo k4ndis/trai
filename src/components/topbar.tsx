@@ -1,4 +1,4 @@
-// src/components/topbar.tsx_test
+// src/components/topbar.tsx
 "use client"
 
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,7 @@ import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
 import { User } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
-
+import { useInformationStore } from "@/lib/store" // für Information-Daten
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
@@ -19,39 +19,61 @@ export function Topbar() {
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
+  const information = useInformationStore((state) => state.fields)
 
   useEffect(() => {
     setMounted(true)
-  
+
     const getUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
       setUser(session?.user || null)
     }
-  
+
     getUser()
-  
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
-  
-      // Nach erfolgreichem Login zur Startseite weiterleiten
+
       if (_event === "SIGNED_IN") {
         router.push("/")
-      }        
+      }
     })
-  
+
     return () => {
       subscription.unsubscribe()
     }
   }, [])
-  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     setUser(null)
+  }
+
+  const handleSave = async () => {
+    if (!user) return alert("Du bist nicht angemeldet.")
+
+    const reportId = information.report // Das Feld „Report“ aus dem Store
+    if (!reportId) return alert("Bitte gib eine Report-ID an.")
+
+    const { error } = await supabase.from("test_reports").upsert([
+      {
+        id: reportId,
+        user_id: user.id,
+        fields: information,
+        created_at: new Date().toISOString(),
+        // test_sequences und test_samples folgen später
+      },
+    ])
+
+    if (error) {
+      alert("Fehler beim Speichern: " + error.message)
+    } else {
+      alert("Testbericht gespeichert ✅")
+    }
   }
 
   return (
@@ -78,17 +100,20 @@ export function Topbar() {
           className="w-64"
         />
         {mounted && (
-          <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}> 
+          <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
         )}
         {user ? (
-  <div className="flex items-center gap-3">
-    <span className="text-sm text-muted-foreground">{user.email}</span>
-    <Button variant="outline" size="sm" onClick={handleSignOut}>
-      Sign Out
-    </Button>
-  </div>
+          <div className="flex items-center gap-3">
+            <Button variant="default" size="sm" onClick={handleSave}>
+              Testbericht speichern
+            </Button>
+            <span className="text-sm text-muted-foreground">{user.email}</span>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </div>
         ) : (
           <Link href="/auth">
             <Button variant="outline" size="sm">

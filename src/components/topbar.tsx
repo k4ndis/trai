@@ -1,4 +1,4 @@
-// src/components/topbar.tsx
+// src/components/topbar.tsx_test
 "use client"
 
 import { Input } from "@/components/ui/input"
@@ -38,7 +38,7 @@ export function Topbar() {
       // Nach erfolgreichem Login zur Startseite weiterleiten
       if (session?.user) {
         window.location.href = "/"
-      }
+      }      
     })
   
     return () => {

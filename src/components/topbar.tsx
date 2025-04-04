@@ -20,13 +20,32 @@ export function Topbar() {
 
   useEffect(() => {
     setMounted(true)
-
+  
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      setUser(data?.user)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user || null)
     }
+  
     getUser()
+  
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+  
+      // Nach erfolgreichem Login zur Startseite weiterleiten
+      if (session?.user) {
+        window.location.href = "/"
+      }
+    })
+  
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
+  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()

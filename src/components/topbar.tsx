@@ -82,7 +82,6 @@ export function Topbar() {
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
         </Button>
-  
         <Link href="/" className="relative w-16 h-12">
           <Image
             src="/logo.png"
@@ -92,15 +91,7 @@ export function Topbar() {
             priority
           />
         </Link>
-  
-        {/* 👇 Save Button direkt nach dem Logo */}
-        {user && (
-          <Button variant="default" size="sm" onClick={handleSave}>
-            Save
-          </Button>
-        )}
       </div>
-  
       <div className="flex items-center gap-4">
         <Input
           placeholder="Search..."
@@ -109,25 +100,20 @@ export function Topbar() {
           className="w-64"
         />
         {mounted && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
+          <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
         )}
         {user ? (
-          <>
+          <div className="flex items-center gap-3">
+            <Button variant="default" size="sm" onClick={handleSave}>
+              Save
+            </Button>
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               Sign Out
             </Button>
-          </>
+          </div>
         ) : (
           <Link href="/auth">
             <Button variant="outline" size="sm">
@@ -138,5 +124,4 @@ export function Topbar() {
       </div>
     </div>
   )
-  
 }

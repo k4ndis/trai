@@ -19,14 +19,16 @@ export function Topbar() {
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    setMounted(true)
-
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      setUser(data?.user)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user || null)
     }
+  
     getUser()
   }, [])
+  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -68,14 +70,13 @@ export function Topbar() {
       Sign Out
     </Button>
   </div>
-) : (
-  <Link href="/auth">
-    <Button variant="outline" size="sm">
-      <LogIn className="h-4 w-4 mr-2" /> Sign In
-    </Button>
-  </Link>
-)}
-
+        ) : (
+          <Link href="/auth">
+            <Button variant="outline" size="sm">
+              <LogIn className="h-4 w-4 mr-2" /> Sign In
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   )

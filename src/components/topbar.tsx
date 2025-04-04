@@ -1,3 +1,4 @@
+// src/components/topbar.tsx
 "use client"
 
 import { Input } from "@/components/ui/input"
@@ -61,16 +62,20 @@ export function Topbar() {
           </Button>
         )}
         {user ? (
-          <Button variant="outline" size="sm" onClick={handleSignOut}>
-            Sign Out
-          </Button>
-        ) : (
-          <Link href="/auth">
-            <Button variant="outline" size="sm">
-              <LogIn className="h-4 w-4 mr-2" /> Sign In
-            </Button>
-          </Link>
-        )}
+  <div className="flex items-center gap-3">
+    <span className="text-sm text-muted-foreground">{user.email}</span>
+    <Button variant="outline" size="sm" onClick={handleSignOut}>
+      Sign Out
+    </Button>
+  </div>
+) : (
+  <Link href="/auth">
+    <Button variant="outline" size="sm">
+      <LogIn className="h-4 w-4 mr-2" /> Sign In
+    </Button>
+  </Link>
+)}
+
       </div>
     </div>
   )

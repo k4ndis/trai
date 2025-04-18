@@ -96,13 +96,13 @@ export default function TestProcedurePage() {
   const updateMultipleFields = useInformationStore((state) => state.updateMultipleFields)
   const fields = useInformationStore((state) => state.fields)
 
+  const testType = fields.testtype // ✅ Zustand statt useState
+
   const testSequences = useInformationStore((state) => state.testSequences)
   const setTestSequences = useInformationStore((state) => state.setTestSequences)
 
   const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
-
-  const [testType, setTestType] = useState("")
 
   // Lädt Daten aus Supabase beim ersten Öffnen
   useEffect(() => {
@@ -125,7 +125,6 @@ export default function TestProcedurePage() {
         updateMultipleFields(data.fields || {})
         setTestSequences(data.test_sequences || [])
         setSamples(data.test_samples || [])
-        setTestType(data.fields?.testtype || "")
       }
     }
 
@@ -198,8 +197,7 @@ export default function TestProcedurePage() {
   }
 
   const clearTestType = () => {
-    setTestType("")
-    update("testtype", "")
+    update("testtype", "") // ✅ ersetzt setTestType("")
   }
 
   const addItemToSequence = (
@@ -240,8 +238,7 @@ export default function TestProcedurePage() {
           <Select
             value={testType}
             onValueChange={(value) => {
-              setTestType(value)
-              update("testtype", value)
+              update("testtype", value) // ✅ Zustand schreiben
             }}
           >
             <SelectTrigger className="w-[300px]">
@@ -275,6 +272,7 @@ export default function TestProcedurePage() {
           </div>
         )}
       </div>
+
 
       {/* Test Sequences Section */}
       <div

@@ -109,7 +109,19 @@ export function Sidebar() {
   )
 }
 
-function SidebarContent({ information, activeField, handleScrollTo, router }: any) {
+type SidebarContentProps = {
+  information: Record<string, string>
+  activeField: string | null
+  handleScrollTo: (id: string, sectionId: string) => void
+  router: ReturnType<typeof useRouter>
+}
+
+function SidebarContent({
+  information,
+  activeField,
+  handleScrollTo,
+  router,
+}: SidebarContentProps) {
   return (
     <Accordion type="multiple" className="w-full">
       {sections.map((section) => (

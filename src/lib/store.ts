@@ -1,29 +1,61 @@
 // src/lib/store.ts
 import { create } from "zustand"
 
-interface InformationState {
-  fields: Record<string, string>
-  updateField: (key: string, value: string) => void
-  getField: (key: string) => string
-  activeSection: string
-  setActiveSection: (section: string) => void
+interface InformationFields {
+  [key: string]: string
 }
 
-export const useInformationStore = create<InformationState>((set, get) => ({
-  fields: {},
-  activeSection: "",
-  
-  updateField: (key, value) => set((state) => ({
-    fields: {
-      ...state.fields,
-      [key]: value,
-    },
-  })),
-  
-  getField: (key) => {
-    const state = get();
-    return state.fields[key] || "";
-  },
+interface TestSequence {
+  id: number
+  type: string
+  temperatures: string[]
+  values: string[]
+  mode: string[]
+  startDate: string
+  endDate: string
+  testbench: string
+  cycles: string
+  temperature: string
+  dwelltime: string
+  comment: string
+}
 
-  setActiveSection: (section) => set({ activeSection: section }),
+interface Sample {
+  id: number
+  productNumber: string
+  productionDate: string
+  serialNumber: string
+  features: string
+}
+
+interface InformationState {
+  fields: InformationFields
+  testSequences: TestSequence[]
+  samples: Sample[]
+  updateField: (fieldId: string, value: string) => void
+  updateMultipleFields: (newFields: InformationFields) => void
+  setTestSequences: (sequences: TestSequence[]) => void
+  setSamples: (samples: Sample[]) => void
+}
+
+export const useInformationStore = create<InformationState>((set) => ({
+  fields: {},
+  testSequences: [],
+  samples: [],
+  updateField: (fieldId, value) =>
+    set((state) => ({
+      fields: {
+        ...state.fields,
+        [fieldId]: value,
+      },
+    })),
+  updateMultipleFields: (newFields) =>
+    set((state) => ({
+      fields: {
+        ...state.fields,
+        ...newFields,
+      },
+    })),
+  setTestSequences: (sequences) => set({ testSequences: sequences }),
+  setSamples: (samples) => set({ samples }),
 }))

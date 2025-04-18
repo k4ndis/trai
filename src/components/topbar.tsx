@@ -23,30 +23,30 @@ export function Topbar() {
 
   useEffect(() => {
     setMounted(true)
-
+  
     const getUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
       setUser(session?.user || null)
     }
-
+  
     getUser()
-
+  
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
-
+  
       if (_event === "SIGNED_IN") {
         router.push("/")
       }
     })
-
+  
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [router]) // ✅ router als Abhängigkeit hinzugefügt  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -55,26 +55,29 @@ export function Topbar() {
 
   const handleSave = async () => {
     if (!user) return alert("You are not logged in.")
-
-    const reportId = information.report // Das Feld „Report“ aus dem Store
+  
+    const { fields, testSequences, samples } = useInformationStore.getState()
+  
+    const reportId = fields.report
     if (!reportId) return alert("Please enter a Report ID")
-
+  
     const { error } = await supabase.from("test_reports").upsert([
       {
         id: reportId,
         user_id: user.id,
-        fields: information,
+        fields,
+        test_sequences: testSequences,
+        test_samples: samples,
         created_at: new Date().toISOString(),
-        // test_sequences und test_samples folgen später
       },
     ])
-
+  
     if (error) {
       alert("Error while saving: " + error.message)
     } else {
       alert("Report saved successfully ✅")
     }
-  }
+  }  
 
   return (
     <div className="flex items-center justify-between border-b pl-1 pr-6 py-1 bg-background shadow-sm">

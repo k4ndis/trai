@@ -18,8 +18,7 @@ export function Topbar() {
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<User | null>(null)
-  const router = useRouter()
-  const information = useInformationStore((state) => state.fields)
+  const router = useRouter()  
 
   useEffect(() => {
     setMounted(true)

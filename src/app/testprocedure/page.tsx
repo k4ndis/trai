@@ -387,34 +387,55 @@ export default function TestProcedurePage() {
             )}
 
             {/* Preaging */}
-            {seq.type === "Preaging" && (
-              <div className="flex flex-wrap gap-4 mt-4">
-                <Input
-                  className="w-[150px]"
-                  placeholder="Cycles"
-                  value={seq.cycles}
-                  onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
-                />
-                <Input
-                  className="w-[180px]"
-                  placeholder="Temperature"
-                  value={seq.temperature}
-                  onChange={(e) => updateTestSequence(seq.id, "temperature", e.target.value)}
-                />
-                <Input
-                  className="w-[180px]"
-                  placeholder="Dwell Time"
-                  value={seq.dwelltime}
-                  onChange={(e) => updateTestSequence(seq.id, "dwelltime", e.target.value)}
-                />
-                <Input
-                  className="w-[300px]"
-                  placeholder="Comment"
-                  value={seq.comment}
-                  onChange={(e) => updateTestSequence(seq.id, "comment", e.target.value)}
-                />
-              </div>
-            )}
+{seq.type === "Preaging" && (
+  <div className="flex flex-wrap gap-4 mt-4">
+    <div>
+      <Label className="mb-1 block">Cycles</Label>
+      <Input
+        className="w-[150px]"
+        placeholder="Cycles"
+        value={seq.cycles}
+        onChange={(e) =>
+          updateTestSequence(seq.id, "cycles", e.target.value)
+        }
+      />
+    </div>
+    <div>
+      <Label className="mb-1 block">Temperature</Label>
+      <Input
+        className="w-[180px]"
+        placeholder="Temperature"
+        value={seq.temperature}
+        onChange={(e) =>
+          updateTestSequence(seq.id, "temperature", e.target.value)
+        }
+      />
+    </div>
+    <div>
+      <Label className="mb-1 block">Dwell Time</Label>
+      <Input
+        className="w-[180px]"
+        placeholder="Dwell Time"
+        value={seq.dwelltime}
+        onChange={(e) =>
+          updateTestSequence(seq.id, "dwelltime", e.target.value)
+        }
+      />
+    </div>
+    <div>
+      <Label className="mb-1 block">Comment</Label>
+      <Input
+        className="w-[300px]"
+        placeholder="Comment"
+        value={seq.comment}
+        onChange={(e) =>
+          updateTestSequence(seq.id, "comment", e.target.value)
+        }
+      />
+    </div>
+  </div>
+)}
+
 
             {/* Durability */}
             {seq.type === "Durability" && (

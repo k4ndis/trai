@@ -59,3 +59,15 @@ export const useInformationStore = create<InformationState>((set) => ({
   setTestSequences: (sequences) => set({ testSequences: sequences }),
   setSamples: (samples) => set({ samples }),
 }))
+
+type UIState = {
+  isMobileSidebarOpen: boolean
+  toggleMobileSidebar: () => void
+  closeMobileSidebar: () => void
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  isMobileSidebarOpen: false,
+  toggleMobileSidebar: () => set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
+  closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
+}))

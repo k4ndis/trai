@@ -11,14 +11,16 @@ import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
 import { User } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
-import { useInformationStore } from "@/lib/store" // für Information-Daten
+import { useInformationStore } from "@/lib/store"
+import { useUIStore } from "@/lib/store"
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
   const [search, setSearch] = useState("")
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<User | null>(null)
-  const router = useRouter()  
+  const router = useRouter()
+  const { toggleMobileSidebar } = useUIStore()  
 
   useEffect(() => {
     setMounted(true)
@@ -81,7 +83,12 @@ export function Topbar() {
   return (
     <div className="flex items-center justify-between border-b pl-1 pr-6 py-1 bg-background shadow-sm">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={toggleMobileSidebar} // ✅ Das ist neu!
+        >
           <Menu className="h-5 w-5" />
         </Button>
         <Link href="/" className="relative w-16 h-12">

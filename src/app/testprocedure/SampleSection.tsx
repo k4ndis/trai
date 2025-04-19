@@ -1,4 +1,3 @@
-// src/app/testprocedure/SampleSection.tsx
 "use client"
 
 import { Label } from "@/components/ui/label"
@@ -31,41 +30,59 @@ export function SampleSection({
       tabIndex={-1}
       className="border border-gray-700 rounded-xl p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
     >
-      <Label className="text-lg">Test Samples</Label>
+      <Label className="text-lg mb-4 block">Test Samples</Label>
+
       {samples.map((sample, index) => (
-        <div key={sample.id} className="border rounded p-4 space-y-2">
-          <div className="flex justify-between">
-          <strong className="text-blue-400 text-lg">Sample {index + 1}</strong>
+        <div key={sample.id} className="border rounded p-4 space-y-4 mb-6">
+          <div className="flex justify-between items-center">
+            <strong className="text-blue-400 text-lg">Sample {index + 1}</strong>
             <Button variant="destructive" size="sm" onClick={() => removeItem(sample.id, true)}>✖</Button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input 
-              placeholder="Product Number" 
-              value={sample.productNumber}
-              onChange={(e) => updateSample(sample.id, "productNumber", e.target.value)}
-            />
-            <Input 
-              placeholder="Production Date" 
-              value={sample.productionDate}
-              onChange={(e) => updateSample(sample.id, "productionDate", e.target.value)}
-            />
-            <Input 
-              placeholder="Serial Number" 
-              value={sample.serialNumber}
-              onChange={(e) => updateSample(sample.id, "serialNumber", e.target.value)}
-            />
-            <Textarea 
-              placeholder="Features / Deviations" 
-              className="col-span-2"
-              value={sample.features}
-              onChange={(e) => updateSample(sample.id, "features", e.target.value)}
-            />
+
+          {/* Universelles Grid-System */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="mb-1 block">Product Number</Label>
+              <Input 
+                placeholder="Product Number" 
+                value={sample.productNumber}
+                onChange={(e) => updateSample(sample.id, "productNumber", e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-1 block">Production Date</Label>
+              <Input 
+                placeholder="Production Date" 
+                value={sample.productionDate}
+                onChange={(e) => updateSample(sample.id, "productionDate", e.target.value)}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label className="mb-1 block">Serial Number</Label>
+              <Input 
+                placeholder="Serial Number" 
+                value={sample.serialNumber}
+                onChange={(e) => updateSample(sample.id, "serialNumber", e.target.value)}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label className="mb-1 block">Features / Deviations</Label>
+              <Textarea 
+                placeholder="Features / Deviations" 
+                value={sample.features}
+                onChange={(e) => updateSample(sample.id, "features", e.target.value)}
+              />
+            </div>
           </div>
         </div>
       ))}
+
       <Button
         onClick={addSample}
-        className="text-xs px-2 py-1 rounded w-fit"
+        className="text-xs px-3 py-2 rounded w-fit"
       >
         + Add Sample
       </Button>

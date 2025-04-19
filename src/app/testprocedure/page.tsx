@@ -340,8 +340,8 @@ export default function TestProcedurePage() {
 
             {/* Function Test */}
             {seq.type === "Function Test" && (
-              <div className="flex flex-wrap gap-6 mt-4 items-start">
-                <div className="min-w-[230px] flex-shrink-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
                   <Label className="mb-1 block">Temperatures</Label>
                   <CheckboxGroup
                     title=""
@@ -352,7 +352,7 @@ export default function TestProcedurePage() {
                   />
                 </div>
 
-                <div className="min-w-[250px] flex-shrink-0">
+                <div>
                   <Label className="mb-1 block">Values</Label>
                   <CheckboxGroup
                     title=""
@@ -366,81 +366,84 @@ export default function TestProcedurePage() {
                   />
                 </div>
 
-                <div className="min-w-[200px]">
+                <div>
                   <Label className="mb-1 block">Start Date</Label>
                   <Input
                     type="date"
                     value={seq.startDate}
-                    onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                    onChange={(e) =>
+                      updateTestSequence(seq.id, "startDate", e.target.value)
+                    }
                   />
                 </div>
 
-                <div className="min-w-[200px]">
+                <div>
                   <Label className="mb-1 block">End Date</Label>
                   <Input
                     type="date"
                     value={seq.endDate}
-                    onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                    onChange={(e) =>
+                      updateTestSequence(seq.id, "endDate", e.target.value)
+                    }
                   />
                 </div>
               </div>
             )}
 
+
             {/* Preaging */}
-{seq.type === "Preaging" && (
-  <div className="flex flex-wrap gap-4 mt-4">
-    <div>
-      <Label className="mb-1 block">Cycles</Label>
-      <Input
-        className="w-[150px]"
-        placeholder="Cycles"
-        value={seq.cycles}
-        onChange={(e) =>
-          updateTestSequence(seq.id, "cycles", e.target.value)
-        }
-      />
-    </div>
-    <div>
-      <Label className="mb-1 block">Temperature</Label>
-      <Input
-        className="w-[180px]"
-        placeholder="Temperature"
-        value={seq.temperature}
-        onChange={(e) =>
-          updateTestSequence(seq.id, "temperature", e.target.value)
-        }
-      />
-    </div>
-    <div>
-      <Label className="mb-1 block">Dwell Time</Label>
-      <Input
-        className="w-[180px]"
-        placeholder="Dwell Time"
-        value={seq.dwelltime}
-        onChange={(e) =>
-          updateTestSequence(seq.id, "dwelltime", e.target.value)
-        }
-      />
-    </div>
-    <div>
-      <Label className="mb-1 block">Comment</Label>
-      <Input
-        className="w-[300px]"
-        placeholder="Comment"
-        value={seq.comment}
-        onChange={(e) =>
-          updateTestSequence(seq.id, "comment", e.target.value)
-        }
-      />
-    </div>
-  </div>
-)}
+            {seq.type === "Preaging" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <Label className="mb-1 block">Cycles</Label>
+                  <Input
+                    placeholder="Cycles"
+                    value={seq.cycles}
+                    onChange={(e) =>
+                      updateTestSequence(seq.id, "cycles", e.target.value)
+                    }
+                  />
+                </div>
 
+                <div>
+                  <Label className="mb-1 block">Temperature</Label>
+                  <Input
+                    placeholder="Temperature"
+                    value={seq.temperature}
+                    onChange={(e) =>
+                      updateTestSequence(seq.id, "temperature", e.target.value)
+                    }
+                  />
+                </div>
 
+                <div>
+                  <Label className="mb-1 block">Dwell Time</Label>
+                  <Input
+                    placeholder="Dwell Time"
+                    value={seq.dwelltime}
+                    onChange={(e) =>
+                      updateTestSequence(seq.id, "dwelltime", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label className="mb-1 block">Comment</Label>
+                  <Input
+                    placeholder="Comment"
+                    value={seq.comment}
+                    onChange={(e) =>
+                      updateTestSequence(seq.id, "comment", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+            )}
+           
             {/* Durability */}
             {seq.type === "Durability" && (
-              <div className="flex flex-wrap gap-6 mt-4 items-start">
-                <div className="min-w-[230px] flex-shrink-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
                   <Label className="mb-1 block">Temperatures</Label>
                   <CheckboxGroup
                     title=""
@@ -451,7 +454,7 @@ export default function TestProcedurePage() {
                   />
                 </div>
 
-                <div className="min-w-[200px] flex-shrink-0">
+                <div>
                   <Label className="mb-1 block">Mode</Label>
                   <CheckboxGroup
                     title=""
@@ -462,7 +465,7 @@ export default function TestProcedurePage() {
                   />
                 </div>
 
-                <div className="min-w-[200px]">
+                <div className="md:col-span-2">
                   <Label className="mb-1 block">Cycles</Label>
                   <Input
                     type="number"

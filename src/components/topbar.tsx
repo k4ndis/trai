@@ -20,34 +20,34 @@ export function Topbar() {
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
-  const { toggleMobileSidebar } = useUIStore()  
+  const { toggleMobileSidebar } = useUIStore()
 
   useEffect(() => {
     setMounted(true)
-  
+
     const getUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
       setUser(session?.user || null)
     }
-  
+
     getUser()
-  
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
-  
+
       if (_event === "SIGNED_IN") {
         router.push("/")
       }
     })
-  
+
     return () => {
       subscription.unsubscribe()
     }
-  }, [router]) // ✅ router als Abhängigkeit hinzugefügt  
+  }, [router])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -56,12 +56,12 @@ export function Topbar() {
 
   const handleSave = async () => {
     if (!user) return alert("You are not logged in.")
-  
+
     const { fields, testSequences, samples } = useInformationStore.getState()
-  
+
     const reportId = fields.report
     if (!reportId) return alert("Please enter a Report ID")
-  
+
     const { error } = await supabase.from("test_reports").upsert([
       {
         id: reportId,
@@ -72,22 +72,23 @@ export function Topbar() {
         created_at: new Date().toISOString(),
       },
     ])
-  
+
     if (error) {
       alert("Error while saving: " + error.message)
     } else {
       alert("Report saved successfully ✅")
     }
-  }  
+  }
 
   return (
-    <div className="flex items-center justify-between border-b pl-1 pr-6 py-1 bg-background shadow-sm">
+    <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-2 px-2 py-1 border-b bg-background shadow-sm">
+      {/* Left: Burger + Logo */}
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
           className="md:hidden"
-          onClick={toggleMobileSidebar} // ✅ Das ist neu!
+          onClick={toggleMobileSidebar}
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -101,24 +102,32 @@ export function Topbar() {
           />
         </Link>
       </div>
-      <div className="flex items-center gap-4">
+
+      {/* Right: Search + Theme + Login/User */}
+      <div className="flex flex-wrap md:flex-nowrap items-center gap-2 ml-auto">
         <Input
           placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-64"
+          className="w-full max-w-xs sm:max-w-sm md:max-w-md"
         />
         {mounted && (
-          <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
         )}
         {user ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
             <Button variant="default" size="sm" onClick={handleSave}>
               Save
             </Button>
-            <span className="text-sm text-muted-foreground">{user.email}</span>
+            <span className="text-sm text-muted-foreground truncate max-w-[120px]">
+              {user.email}
+            </span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               Sign Out
             </Button>

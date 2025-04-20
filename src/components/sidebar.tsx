@@ -169,3 +169,12 @@ function SidebarContent({
     </Accordion>
   )
 }
+
+<div className="mt-8 border-t pt-4">
+  <button
+    onClick={() => router.push("/login")}
+    className="w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground hover:underline"
+  >
+    Sign In
+  </button>
+</div>

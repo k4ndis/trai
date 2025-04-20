@@ -76,17 +76,8 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Gemeinsame Sidebar für Desktop und Mobile */}
-      <aside
-        className={cn(
-          "h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 transition-transform duration-300",
-          {
-            "hidden md:block": !isMobileSidebarOpen,  // Mobil: unsichtbar
-            "block w-64": isMobileSidebarOpen,        // Mobil: sichtbar
-            "md:block w-64": true                     // Desktop: immer sichtbar
-          }
-        )}
-      >
+      {/* Desktop Sidebar */}
+      <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
         <SidebarContent
           information={information}
           activeField={activeField}
@@ -95,12 +86,24 @@ export function Sidebar() {
         />
       </aside>
 
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay + Sidebar */}
       {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
           onClick={closeMobileSidebar}
-        />
+        >
+          <aside
+            className="w-64 h-full bg-background border-r p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SidebarContent
+              information={information}
+              activeField={activeField}
+              handleScrollTo={handleScrollTo}
+              router={router}
+            />
+          </aside>
+        </div>
       )}
     </>
   )

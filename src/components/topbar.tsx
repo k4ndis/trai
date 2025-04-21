@@ -1,8 +1,7 @@
-// src/components/topbar.tsx
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { LogIn, Menu, Save, Search } from "lucide-react"
+import { LogIn, Menu, Search } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -78,9 +77,11 @@ export function Topbar() {
             <Search className="h-5 w-5" />
           </Button>
 
-          <Button variant="default" size="sm" onClick={handleSave}>
-            Save
-          </Button>
+          {user && (
+            <Button variant="default" size="sm" onClick={handleSave}>
+              Save
+            </Button>
+          )}
 
           {user ? (
             <UserMenu />

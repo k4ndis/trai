@@ -1,6 +1,7 @@
 // src/app/testsamples/page.tsx
 "use client"
 
+import type { Sample } from "@/app/testprocedure/SampleSection"
 import { SampleSection } from "@/app/testprocedure/SampleSection"
 import { useInformationStore } from "@/lib/store"
 import { useEffect } from "react"

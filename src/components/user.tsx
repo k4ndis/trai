@@ -1,65 +1,81 @@
 // src/components/user.tsx
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { supabase } from "@/lib/supabaseClient"
+import { Moon, Sun, LogOut } from "lucide-react"
 import { useTheme } from "next-themes"
-import { LogOut, Moon, Sun } from "lucide-react"
+import { supabase } from "@/lib/supabaseClient"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { User } from "@supabase/supabase-js"
 
 export function UserMenu() {
-  const [email, setEmail] = useState<string | null>(null)
-  const { setTheme, theme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
-    const getSession = async () => {
+    const getUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
-      setEmail(session?.user?.email ?? null)
+      setUser(session?.user || null)
     }
 
-    getSession()
+    getUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    location.reload()
+    setUser(null)
+    router.push("/auth")
   }
+
+  if (!user) return null
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Avatar className="h-6 w-6">
-            <AvatarFallback>{email?.charAt(0).toUpperCase() ?? "U"}</AvatarFallback>
-          </Avatar>
-        </Button>
+        <Avatar className="h-8 w-8 cursor-pointer">
+          <AvatarFallback>{user.email?.[0]?.toUpperCase()}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>{email ?? "User"}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" /> Light
+      <DropdownMenuContent align="end" className="w-48">
+        <div className="px-3 py-2 text-xs text-muted-foreground">
+          {user.email}
+        </div>
+        <DropdownMenuItem
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? (
+            <>
+              <Sun className="w-4 h-4 mr-2" />
+              Light Mode
+            </>
+          ) : (
+            <>
+              <Moon className="w-4 h-4 mr-2" />
+              Dark Mode
+            </>
+          )}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" /> Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
-
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4" /> Sign Out
+          <LogOut className="w-4 h-4 mr-2" />
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

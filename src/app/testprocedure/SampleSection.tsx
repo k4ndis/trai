@@ -5,23 +5,24 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
-interface Sample {
-  id: number;
-  productNumber: string;
-  productionDate: string;
-  serialNumber: string;
-  features: string;
+// ✅ Exportierbarer Typ für Verwendung in anderen Dateien
+export interface Sample {
+  id: number
+  productNumber: string
+  productionDate: string
+  serialNumber: string
+  features: string
 }
 
 export function SampleSection({
   samples,
   updateSample,
   addSample,
-  removeItem
+  removeItem,
 }: {
-  samples: Sample[],
-  updateSample: (id: number, field: keyof Sample, value: string) => void,
-  addSample: () => void,
+  samples: Sample[]
+  updateSample: (id: number, field: keyof Sample, value: string) => void
+  addSample: () => void
   removeItem: (id: number, isSample?: boolean) => void
 }) {
   return (
@@ -36,15 +37,16 @@ export function SampleSection({
         <div key={sample.id} className="border rounded p-4 space-y-4 mb-6">
           <div className="flex justify-between items-center">
             <strong className="text-blue-400 text-lg">Sample {index + 1}</strong>
-            <Button variant="destructive" size="sm" onClick={() => removeItem(sample.id, true)}>✖</Button>
+            <Button variant="destructive" size="sm" onClick={() => removeItem(sample.id, true)}>
+              ✖
+            </Button>
           </div>
 
-          {/* Universelles Grid-System */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="mb-1 block">Product Number</Label>
-              <Input 
-                placeholder="Product Number" 
+              <Input
+                placeholder="Product Number"
                 value={sample.productNumber}
                 onChange={(e) => updateSample(sample.id, "productNumber", e.target.value)}
               />
@@ -52,8 +54,8 @@ export function SampleSection({
 
             <div>
               <Label className="mb-1 block">Production Date</Label>
-              <Input 
-                placeholder="Production Date" 
+              <Input
+                placeholder="Production Date"
                 value={sample.productionDate}
                 onChange={(e) => updateSample(sample.id, "productionDate", e.target.value)}
               />
@@ -61,8 +63,8 @@ export function SampleSection({
 
             <div className="md:col-span-2">
               <Label className="mb-1 block">Serial Number</Label>
-              <Input 
-                placeholder="Serial Number" 
+              <Input
+                placeholder="Serial Number"
                 value={sample.serialNumber}
                 onChange={(e) => updateSample(sample.id, "serialNumber", e.target.value)}
               />
@@ -70,8 +72,8 @@ export function SampleSection({
 
             <div className="md:col-span-2">
               <Label className="mb-1 block">Features / Deviations</Label>
-              <Textarea 
-                placeholder="Features / Deviations" 
+              <Textarea
+                placeholder="Features / Deviations"
                 value={sample.features}
                 onChange={(e) => updateSample(sample.id, "features", e.target.value)}
               />
@@ -80,10 +82,7 @@ export function SampleSection({
         </div>
       ))}
 
-      <Button
-        onClick={addSample}
-        className="text-xs px-3 py-2 rounded w-fit"
-      >
+      <Button onClick={addSample} className="text-xs px-3 py-2 rounded w-fit">
         + Add Sample
       </Button>
     </div>

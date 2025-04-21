@@ -1,7 +1,7 @@
 // src/app/testsamples/page.tsx
 "use client"
 
-import { SampleSection } from "@/components/SampleSection"
+import { SampleSection } from "@/app/testprocedure/SampleSection"
 import { useInformationStore } from "@/lib/store"
 import { useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"

@@ -483,3 +483,6 @@ export default function TestProcedurePage() {
           + Add Test Sequence
         </Button>
       </div>
+    </div>
+  );
+}

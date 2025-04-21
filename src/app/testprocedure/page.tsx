@@ -32,14 +32,6 @@ interface TestSequence {
   comment: string
 }
 
-interface Sample {
-  id: number
-  productNumber: string
-  productionDate: string
-  serialNumber: string
-  features: string
-}
-
 function CheckboxGroup({
   title,
   options,

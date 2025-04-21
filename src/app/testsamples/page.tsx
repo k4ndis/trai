@@ -59,6 +59,13 @@ export default function TestSamplesPage() {
     setSamples(updated)
   }
 
+  const updateSampleImages = (id: number, newImages: { url: string; label: string }[]) => {
+    const updated = samples.map((s) =>
+      s.id === id ? { ...s, images: newImages } : s
+    )
+    setSamples(updated)
+  }
+
   const removeItem = (id: number, isSample = false) => {
     if (isSample) {
       setSamples(samples.filter((s) => s.id !== id))
@@ -70,6 +77,7 @@ export default function TestSamplesPage() {
       <SampleSection
         samples={samples}
         updateSample={updateSample}
+        updateSampleImages={updateSampleImages}
         addSample={addSample}
         removeItem={removeItem}
       />

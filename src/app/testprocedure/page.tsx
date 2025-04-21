@@ -175,26 +175,6 @@ export default function TestProcedurePage() {
     }
   }
 
-  const addSample = () => {
-    setSamples([
-      ...samples,
-      {
-        id: Date.now(),
-        productNumber: "",
-        productionDate: "",
-        serialNumber: "",
-        features: "",
-      },
-    ])
-  }
-
-  const updateSample = (id: number, field: keyof Sample, value: string) => {
-    const updated = samples.map((s) =>
-      s.id === id ? { ...s, [field]: value } : s
-    )
-    setSamples(updated)
-  }
-
   const clearTestType = () => {
     update("testtype", "") // ✅ ersetzt setTestType("")
   }

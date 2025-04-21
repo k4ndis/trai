@@ -2,8 +2,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import Cropper from "react-easy-crop"
-import { getCroppedImg } from "@/lib/cropImage"
+import Cropper, { Area } from "react-easy-crop"
 import { supabase } from "@/lib/supabaseClient"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -17,7 +16,7 @@ interface Props {
 
 export default function ImageUploader({ sampleId, onUpload }: Props) {
   const [imageSrc, setImageSrc] = useState<string | null>(null)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [label, setLabel] = useState("")
@@ -33,7 +32,7 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     reader.readAsDataURL(file)
   }
 
-  const onCropComplete = useCallback((_: any, croppedPixels: any) => {
+  const onCropComplete = useCallback((_croppedArea: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels)
   }, [])
 
@@ -44,15 +43,15 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels)
     const fileName = `sample-${sampleId}-${Date.now()}.jpg`
 
-    const { data, error } = await supabase.storage
+    const uploadResult = await supabase.storage
       .from("trai")
       .upload(fileName, croppedBlob, {
         contentType: "image/jpeg",
         upsert: true,
       })
 
-    if (error) {
-      alert("Upload fehlgeschlagen: " + error.message)
+    if (uploadResult.error) {
+      alert("Upload fehlgeschlagen: " + uploadResult.error.message)
       setUploading(false)
       return
     }
@@ -91,7 +90,6 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />
-
           <Button onClick={handleUpload} disabled={uploading}>
             {uploading ? "Hochladen..." : "Upload & Save"}
           </Button>
@@ -99,4 +97,35 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       )}
     </div>
   )
+}
+
+// Hilfsfunktion zum Zuschneiden (wie früher in cropImage.ts ausgelagert)
+async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
+  const image = new Image()
+  image.src = imageSrc
+  await new Promise((resolve) => (image.onload = resolve))
+
+  const canvas = document.createElement("canvas")
+  canvas.width = pixelCrop.width
+  canvas.height = pixelCrop.height
+  const ctx = canvas.getContext("2d")!
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  )
+
+  return await new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) throw new Error("Canvas blob ist leer.")
+      resolve(blob)
+    }, "image/jpeg")
+  })
 }

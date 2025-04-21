@@ -1,4 +1,5 @@
 // src/lib/store.ts
+// src/lib/store.ts
 import { create } from "zustand"
 
 interface InformationFields {
@@ -62,12 +63,19 @@ export const useInformationStore = create<InformationState>((set) => ({
 
 type UIState = {
   isMobileSidebarOpen: boolean
+  isSearchOpen: boolean
   toggleMobileSidebar: () => void
   closeMobileSidebar: () => void
+  openSearch: () => void
+  closeSearch: () => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
   isMobileSidebarOpen: false,
-  toggleMobileSidebar: () => set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
+  isSearchOpen: false,
+  toggleMobileSidebar: () =>
+    set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
   closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
+  openSearch: () => set({ isSearchOpen: true }),
+  closeSearch: () => set({ isSearchOpen: false }),
 }))

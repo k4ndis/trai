@@ -4,14 +4,21 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import ImageUploader from "@/components/image"
 
 // ✅ Exportierbarer Typ für Verwendung in anderen Dateien
+export interface SampleImage {
+  url: string
+  label: string
+}
+
 export interface Sample {
   id: number
   productNumber: string
   productionDate: string
   serialNumber: string
   features: string
+  images: SampleImage[]
 }
 
 export function SampleSection({
@@ -19,11 +26,13 @@ export function SampleSection({
   updateSample,
   addSample,
   removeItem,
+  updateSampleImages,
 }: {
   samples: Sample[]
   updateSample: (id: number, field: keyof Sample, value: string) => void
   addSample: () => void
   removeItem: (id: number, isSample?: boolean) => void
+  updateSampleImages: (sampleId: number, images: SampleImage[]) => void
 }) {
   return (
     <div
@@ -78,6 +87,30 @@ export function SampleSection({
                 onChange={(e) => updateSample(sample.id, "features", e.target.value)}
               />
             </div>
+
+            <div className="md:col-span-2">
+              <ImageUploader
+                sampleId={sample.id}
+                onUpload={(url, label) => {
+                  const newImages = [...(sample.images || []), { url, label }]
+                  updateSampleImages(sample.id, newImages)
+                }}
+              />
+            </div>
+
+            {sample.images?.length > 0 && (
+              <div className="md:col-span-2">
+                <Label className="mb-1 block">Uploaded Images</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {sample.images.map((img, i) => (
+                    <div key={i} className="border rounded overflow-hidden">
+                      <img src={img.url} alt={img.label} className="w-full h-32 object-cover" />
+                      <div className="text-xs p-1 text-muted-foreground">{img.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ))}

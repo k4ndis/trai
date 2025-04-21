@@ -28,9 +28,14 @@ const sections = [
     ],
   },
   {
+    id: "testsamples",
+    label: "Test Samples",
+    items: [],
+  },
+  {
     id: "testprocedure",
     label: "Test Procedure",
-    items: ["Test Type", "Test Sequence", "Test Samples"],
+    items: ["Test Type", "Test Sequence"],
   },
 ]
 
@@ -39,7 +44,6 @@ export function Sidebar() {
   const router = useRouter()
   const information = useInformationStore((state) => state.fields)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
-
   const [activeField, setActiveField] = useState<string | null>(null)
 
   useEffect(() => {
@@ -76,7 +80,6 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
         <SidebarContent
           information={information}
@@ -86,7 +89,6 @@ export function Sidebar() {
         />
       </aside>
 
-      {/* Mobile Overlay + Sidebar */}
       {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
@@ -127,43 +129,46 @@ function SidebarContent({
       {sections.map((section) => (
         <AccordionItem key={section.id} value={section.id}>
           <AccordionTrigger
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/${section.id}`)
+            }}
             className={cn(
               "group w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 no-underline"
             )}
           >
-            <span
-              className="cursor-pointer w-full text-left"
-              onClick={() => router.push(`/${section.id}`)}
-            >
+            <span className="cursor-pointer w-full text-left">
               {section.label}
             </span>
           </AccordionTrigger>
 
-          <AccordionContent>
-            <ul className="space-y-1 pl-2 text-sm">
-              {section.items.map((item: string) => (
-                <li key={item}>
-                  <button
-                    onClick={() => handleScrollTo(item, section.id)}
-                    className={cn(
-                      "text-left w-full text-sm rounded px-1",
-                      activeField?.toLowerCase().replace(/ /g, "") === item.toLowerCase().replace(/ /g, "")
-                        ? "bg-accent text-accent-foreground font-medium"
-                        : "hover:bg-accent hover:text-accent-foreground"
+          {section.items.length > 0 && (
+            <AccordionContent>
+              <ul className="space-y-1 pl-2 text-sm">
+                {section.items.map((item: string) => (
+                  <li key={item}>
+                    <button
+                      onClick={() => handleScrollTo(item, section.id)}
+                      className={cn(
+                        "text-left w-full text-sm rounded px-1",
+                        activeField?.toLowerCase().replace(/ /g, "") ===
+                          item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      {item}
+                    </button>
+                    {information[item.toLowerCase().replace(/ /g, "")] && (
+                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
+                        {information[item.toLowerCase().replace(/ /g, "")]}
+                      </div>
                     )}
-                  >
-                    {item}
-                  </button>
-                  {information[item.toLowerCase().replace(/ /g, "")] && (
-                    <div className="text-muted-foreground text-xs mt-0.5 pl-1">
-                      {information[item.toLowerCase().replace(/ /g, "")]}
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </AccordionContent>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          )}
         </AccordionItem>
       ))}
     </Accordion>

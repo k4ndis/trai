@@ -185,7 +185,6 @@ export default function TestProcedurePage() {
         productionDate: "",
         serialNumber: "",
         features: "",
-        images: [],
       },
     ])
   }

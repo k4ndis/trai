@@ -47,6 +47,7 @@ export default function TestSamplesPage() {
         productionDate: "",
         serialNumber: "",
         features: "",
+        images: [],
       },
     ])
   }

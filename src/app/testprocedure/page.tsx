@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { X } from "lucide-react"
-import { SampleSection } from "./SampleSection"
 import { useInformationStore } from "@/lib/store"
 import { supabase } from "@/lib/supabaseClient"
 

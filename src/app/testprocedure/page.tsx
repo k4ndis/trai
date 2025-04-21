@@ -483,14 +483,3 @@ export default function TestProcedurePage() {
           + Add Test Sequence
         </Button>
       </div>
-
-      {/* Sample Section */}
-      <SampleSection
-        samples={samples}
-        updateSample={updateSample}
-        addSample={addSample}
-        removeItem={removeItem}
-      />
-    </div>
-  )
-}

@@ -1,5 +1,4 @@
 // src/lib/store.ts
-// src/lib/store.ts
 import { create } from "zustand"
 
 interface InformationFields {
@@ -21,12 +20,18 @@ interface TestSequence {
   comment: string
 }
 
+interface SampleImage {
+  url: string
+  label: string
+}
+
 interface Sample {
   id: number
   productNumber: string
   productionDate: string
   serialNumber: string
   features: string
+  images: SampleImage[]
 }
 
 interface InformationState {
@@ -37,6 +42,8 @@ interface InformationState {
   updateMultipleFields: (newFields: InformationFields) => void
   setTestSequences: (sequences: TestSequence[]) => void
   setSamples: (samples: Sample[]) => void
+  addSampleImage: (sampleId: number, image: SampleImage) => void
+  removeSampleImage: (sampleId: number, imageUrl: string) => void
 }
 
 export const useInformationStore = create<InformationState>((set) => ({
@@ -59,6 +66,20 @@ export const useInformationStore = create<InformationState>((set) => ({
     })),
   setTestSequences: (sequences) => set({ testSequences: sequences }),
   setSamples: (samples) => set({ samples }),
+  addSampleImage: (sampleId, image) =>
+    set((state) => ({
+      samples: state.samples.map((s) =>
+        s.id === sampleId ? { ...s, images: [...(s.images || []), image] } : s
+      ),
+    })),
+  removeSampleImage: (sampleId, imageUrl) =>
+    set((state) => ({
+      samples: state.samples.map((s) =>
+        s.id === sampleId
+          ? { ...s, images: s.images.filter((img) => img.url !== imageUrl) }
+          : s
+      ),
+    })),
 }))
 
 type UIState = {

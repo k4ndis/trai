@@ -48,6 +48,10 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       .upload(fileName, croppedBlob, {
         contentType: "image/jpeg",
         upsert: true,
+        // wichtig: owner setzen
+        metadata: {
+          owner: (await supabase.auth.getUser()).data.user?.id,
+        },
       })
 
     if (uploadResult.error) {

@@ -41,7 +41,7 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     setUploading(true)
 
     // Aktuellen User holen
-    const { data: userData, error: userError } = await supabase.auth.getUser()
+    const { data: userData } = await supabase.auth.getUser()
     const userId = userData?.user?.id
 
     if (!userId) {

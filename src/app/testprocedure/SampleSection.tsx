@@ -5,9 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import ImageUploader from "@/components/image"
-import { supabase } from "@/lib/supabaseClient"
 
-// ✅ Exportierbarer Typ für Verwendung in anderen Dateien
 export interface SampleImage {
   url: string
   label: string
@@ -35,22 +33,19 @@ export function SampleSection({
   removeItem: (id: number, isSample?: boolean) => void
   updateSampleImages: (sampleId: number, images: SampleImage[]) => void
 }) {
-  const handleDeleteImage = async (sampleId: number, imageUrl: string) => {
-    const filePath = imageUrl.split("/storage/v1/object/public/")[1]
-    if (!filePath) return
+  const handleDeleteImage = (sampleId: number, index: number, url: string) => {
+    const updatedImages = [...samples.find((s) => s.id === sampleId)!.images]
+    updatedImages.splice(index, 1)
+    updateSampleImages(sampleId, updatedImages)
 
-    const { error } = await supabase.storage.from("trai").remove([filePath])
-    if (error) {
-      alert("Bild konnte nicht gelöscht werden: " + error.message)
-      return
+    const path = url.split("/public/")[1] // z. B. trai/sample-xxxx.jpg
+    if (path) {
+      fetch("/api/delete_image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path }),
+      })
     }
-
-    const updated = samples.map((sample) =>
-      sample.id === sampleId
-        ? { ...sample, images: sample.images.filter((img) => img.url !== imageUrl) }
-        : sample
-    )
-    updateSampleImages(sampleId, updated.find((s) => s.id === sampleId)?.images || [])
   }
 
   return (
@@ -122,19 +117,15 @@ export function SampleSection({
                 <Label className="mb-1 block">Uploaded Images</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {sample.images.map((img, i) => (
-                    <div key={i} className="border rounded overflow-hidden">
+                    <div key={i} className="border rounded overflow-hidden relative group">
                       <img src={img.url} alt={img.label} className="w-full h-32 object-cover" />
-                      <div className="text-xs p-1 text-muted-foreground flex justify-between items-center">
-                        <span>{img.label}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-500 hover:text-red-700"
-                          onClick={() => handleDeleteImage(sample.id, img.url)}
-                        >
-                          ✖
-                        </Button>
-                      </div>
+                      <div className="text-xs p-1 text-muted-foreground">{img.label}</div>
+                      <button
+                        onClick={() => handleDeleteImage(sample.id, i, img.url)}
+                        className="absolute bottom-1 right-1 text-xs bg-black bg-opacity-50 px-1 rounded text-white"
+                      >
+                        ✖
+                      </button>
                     </div>
                   ))}
                 </div>

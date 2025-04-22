@@ -40,6 +40,16 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     if (!imageSrc || !croppedAreaPixels) return
     setUploading(true)
 
+    // Aktuellen User holen
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+    const userId = userData?.user?.id
+
+    if (!userId) {
+      alert("Kein eingeloggter Benutzer gefunden.")
+      setUploading(false)
+      return
+    }
+
     const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels)
     const fileName = `sample-${sampleId}-${Date.now()}.jpg`
 
@@ -48,9 +58,8 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       .upload(fileName, croppedBlob, {
         contentType: "image/jpeg",
         upsert: true,
-        // wichtig: owner setzen
         metadata: {
-          owner: (await supabase.auth.getUser()).data.user?.id,
+          owner: userId,
         },
       })
 

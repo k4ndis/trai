@@ -16,7 +16,6 @@ import { X } from "lucide-react"
 import { useInformationStore } from "@/lib/store"
 import { supabase } from "@/lib/supabaseClient"
 
-// Typdefinitionen für TestSequences und Samples
 interface TestSequence {
   id: number
   type: string
@@ -81,22 +80,17 @@ function CheckboxGroup({
   )
 }
 
-
-// Zugriff auf zentralen Zustand
 export default function TestProcedurePage() {
   const update = useInformationStore((state) => state.updateField)
   const updateMultipleFields = useInformationStore((state) => state.updateMultipleFields)
   const fields = useInformationStore((state) => state.fields)
 
-  const testType = fields.testtype // ✅ Zustand statt useState
-
+  const testType = fields.testtype
   const testSequences = useInformationStore((state) => state.testSequences)
   const setTestSequences = useInformationStore((state) => state.setTestSequences)
-
   const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
 
-  // Lädt Daten aus Supabase beim ersten Öffnen
   useEffect(() => {
     const loadData = async () => {
       const reportId = fields.report
@@ -170,7 +164,7 @@ export default function TestProcedurePage() {
   }
 
   const clearTestType = () => {
-    update("testtype", "") // ✅ ersetzt setTestType("")
+    update("testtype", "")
   }
 
   const addItemToSequence = (
@@ -199,19 +193,17 @@ export default function TestProcedurePage() {
 
   return (
     <div className="space-y-10">
-      {/* Test Type Section */}
       <div
         id="testtype"
         tabIndex={-1}
         className="border border-gray-700 rounded-xl p-4 mb-6"
       >
         <Label className="text-lg mb-2 block">Test Type</Label>
-
         {!testType && (
           <Select
             value={testType}
             onValueChange={(value) => {
-              update("testtype", value) // ✅ Zustand schreiben
+              update("testtype", value)
             }}
           >
             <SelectTrigger className="w-[300px]">
@@ -246,9 +238,7 @@ export default function TestProcedurePage() {
         )}
       </div>
 
-
-      {/* Test Sequences Section */}
-      <div
+            <div
         id="testsequence"
         tabIndex={-1}
         className="border border-gray-700 rounded-xl p-4 mb-6"
@@ -265,7 +255,6 @@ export default function TestProcedurePage() {
               </Button>
             </div>
 
-            {/* Test Type Dropdown pro Sequence */}
             {!seq.type && (
               <Select
                 value={seq.type}
@@ -282,7 +271,7 @@ export default function TestProcedurePage() {
               </Select>
             )}
 
-{seq.type && (
+            {seq.type && (
               <div className="flex flex-wrap gap-6 items-center mt-2">
                 <div className="flex flex-col">
                   <Label className="mb-1 block">Test Type</Label>
@@ -311,198 +300,108 @@ export default function TestProcedurePage() {
               </div>
             )}
 
-            {/* Function Test */}
             {seq.type === "Function Test" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <Label className="mb-1 block">Temperatures</Label>
-                  <CheckboxGroup
-                    title=""
-                    options={["RT", "-40°C", "+85°C"]}
-                    selected={seq.temperatures}
-                    onAdd={(temp) => addItemToSequence(seq.id, "temperatures", temp)}
-                    onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
-                  />
-                </div>
-
-                <div>
-                  <Label className="mb-1 block">Values</Label>
-                  <CheckboxGroup
-                    title=""
-                    options={[
-                      "pneumatic leak proof / responsiveness",
-                      "characteristic curve / controlling characteristics",
-                    ]}
-                    selected={seq.values}
-                    onAdd={(val) => addItemToSequence(seq.id, "values", val)}
-                    onRemove={(val) => removeItemFromSequence(seq.id, "values", val)}
-                  />
-                </div>
-
-                <div>
-                  <Label className="mb-1 block">Start Date</Label>
-                  <Input
-                    type="date"
-                    value={seq.startDate}
-                    onChange={(e) =>
-                      updateTestSequence(seq.id, "startDate", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label className="mb-1 block">End Date</Label>
-                  <Input
-                    type="date"
-                    value={seq.endDate}
-                    onChange={(e) =>
-                      updateTestSequence(seq.id, "endDate", e.target.value)
-                    }
-                  />
-                </div>
+                <CheckboxGroup
+                  options={["RT", "-40°C", "+85°C"]}
+                  selected={seq.temperatures}
+                  onAdd={(val) => addItemToSequence(seq.id, "temperatures", val)}
+                  onRemove={(val) => removeItemFromSequence(seq.id, "temperatures", val)}
+                />
+                <CheckboxGroup
+                  options={[
+                    "pneumatic leak proof / responsiveness",
+                    "characteristic curve / controlling characteristics",
+                  ]}
+                  selected={seq.values}
+                  onAdd={(val) => addItemToSequence(seq.id, "values", val)}
+                  onRemove={(val) => removeItemFromSequence(seq.id, "values", val)}
+                />
+                <Input
+                  type="date"
+                  value={seq.startDate}
+                  onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                />
+                <Input
+                  type="date"
+                  value={seq.endDate}
+                  onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                />
               </div>
             )}
 
-            {/* Sample Selection */}
-            <div className="mt-4">
-              <Label className="mb-1 block">Assigned Samples</Label>
-              <div className="flex flex-wrap gap-3">
-                {samples.map((sample) => {
-                  const sampleLabel = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
-                  const isSelected = seq.sampleIds?.includes(sample.id)
-            
-                  return (
-                    <label key={sample.id} className="flex items-center gap-2 text-sm">
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={(checked) => {
-                          const updatedIds = isSelected
-                            ? seq.sampleIds.filter((id) => id !== sample.id)
-                            : [...(seq.sampleIds || []), sample.id]
-            
-                          updateTestSequence(seq.id, "sampleIds", updatedIds)
-                        }}
-                      />
-                      {sampleLabel}
-                    </label>
-                  )
-                })}
-              </div>
-            </div>
-
-
-            {/* Preaging */}
             {seq.type === "Preaging" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <Label className="mb-1 block">Cycles</Label>
-                  <Input
-                    placeholder="Cycles"
-                    value={seq.cycles}
-                    onChange={(e) =>
-                      updateTestSequence(seq.id, "cycles", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label className="mb-1 block">Temperature</Label>
-                  <Input
-                    placeholder="Temperature"
-                    value={seq.temperature}
-                    onChange={(e) =>
-                      updateTestSequence(seq.id, "temperature", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label className="mb-1 block">Dwell Time</Label>
-                  <Input
-                    placeholder="Dwell Time"
-                    value={seq.dwelltime}
-                    onChange={(e) =>
-                      updateTestSequence(seq.id, "dwelltime", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <Label className="mb-1 block">Comment</Label>
-                  <Input
-                    placeholder="Comment"
-                    value={seq.comment}
-                    onChange={(e) =>
-                      updateTestSequence(seq.id, "comment", e.target.value)
-                    }
-                  />
-                </div>
+                <Input
+                  placeholder="Cycles"
+                  value={seq.cycles}
+                  onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
+                />
+                <Input
+                  placeholder="Temperature"
+                  value={seq.temperature}
+                  onChange={(e) => updateTestSequence(seq.id, "temperature", e.target.value)}
+                />
+                <Input
+                  placeholder="Dwell Time"
+                  value={seq.dwelltime}
+                  onChange={(e) => updateTestSequence(seq.id, "dwelltime", e.target.value)}
+                />
+                <Input
+                  placeholder="Comment"
+                  value={seq.comment}
+                  onChange={(e) => updateTestSequence(seq.id, "comment", e.target.value)}
+                  className="col-span-2"
+                />
               </div>
             )}
 
-            {/* Sample Selection */}
+            {seq.type === "Durability" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <CheckboxGroup
+                  options={["RT", "-40°C", "+85°C"]}
+                  selected={seq.temperatures}
+                  onAdd={(val) => addItemToSequence(seq.id, "temperatures", val)}
+                  onRemove={(val) => removeItemFromSequence(seq.id, "temperatures", val)}
+                />
+                <CheckboxGroup
+                  options={["Normal", "HAD"]}
+                  selected={seq.mode}
+                  onAdd={(val) => addItemToSequence(seq.id, "mode", val)}
+                  onRemove={(val) => removeItemFromSequence(seq.id, "mode", val)}
+                />
+                <Input
+                  type="number"
+                  value={seq.cycles}
+                  onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
+                  className="col-span-2"
+                />
+              </div>
+            )}
+
             <div className="mt-4">
               <Label className="mb-1 block">Assigned Samples</Label>
               <div className="flex flex-wrap gap-3">
                 {samples.map((sample) => {
-                  const sampleLabel = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+                  const label = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
                   const isSelected = seq.sampleIds?.includes(sample.id)
-            
                   return (
                     <label key={sample.id} className="flex items-center gap-2 text-sm">
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={(checked) => {
+                        onCheckedChange={() => {
                           const updatedIds = isSelected
                             ? seq.sampleIds.filter((id) => id !== sample.id)
                             : [...(seq.sampleIds || []), sample.id]
-            
                           updateTestSequence(seq.id, "sampleIds", updatedIds)
                         }}
                       />
-                      {sampleLabel}
+                      {label}
                     </label>
                   )
                 })}
               </div>
             </div>
-           
-            {/* Durability */}
-            {seq.type === "Durability" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <Label className="mb-1 block">Temperatures</Label>
-                  <CheckboxGroup
-                    title=""
-                    options={["RT", "-40°C", "+85°C"]}
-                    selected={seq.temperatures}
-                    onAdd={(temp) => addItemToSequence(seq.id, "temperatures", temp)}
-                    onRemove={(temp) => removeItemFromSequence(seq.id, "temperatures", temp)}
-                  />
-                </div>
-
-                <div>
-                  <Label className="mb-1 block">Mode</Label>
-                  <CheckboxGroup
-                    title=""
-                    options={["Normal", "HAD"]}
-                    selected={seq.mode}
-                    onAdd={(mode) => addItemToSequence(seq.id, "mode", mode)}
-                    onRemove={(mode) => removeItemFromSequence(seq.id, "mode", mode)}
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <Label className="mb-1 block">Cycles</Label>
-                  <Input
-                    type="number"
-                    placeholder="Enter number of cycles"
-                    value={seq.cycles}
-                    onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         ))}
 
@@ -511,5 +410,5 @@ export default function TestProcedurePage() {
         </Button>
       </div>
     </div>
-  );
+  )
 }

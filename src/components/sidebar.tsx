@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { useInformationStore, useUIStore } from "@/lib/store"
+import { useInformationStore, useSamplesStore, useUIStore } from "@/lib/store"
 import { useEffect, useState } from "react"
 
 const sections = [
@@ -30,7 +30,7 @@ const sections = [
   {
     id: "testsamples",
     label: "Test Samples",
-    items: [],
+    items: [], // Dynamisch unten ergänzt
   },
   {
     id: "testprocedure",
@@ -43,6 +43,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const information = useInformationStore((state) => state.fields)
+  const samples = useSamplesStore((state) => state.samples)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
   const [activeField, setActiveField] = useState<string | null>(null)
 
@@ -83,6 +84,7 @@ export function Sidebar() {
       <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
         <SidebarContent
           information={information}
+          samples={samples}
           activeField={activeField}
           handleScrollTo={handleScrollTo}
           router={router}
@@ -100,6 +102,7 @@ export function Sidebar() {
           >
             <SidebarContent
               information={information}
+              samples={samples}
               activeField={activeField}
               handleScrollTo={handleScrollTo}
               router={router}
@@ -113,6 +116,7 @@ export function Sidebar() {
 
 type SidebarContentProps = {
   information: Record<string, string>
+  samples: any[]
   activeField: string | null
   handleScrollTo: (id: string, sectionId: string) => void
   router: ReturnType<typeof useRouter>
@@ -120,6 +124,7 @@ type SidebarContentProps = {
 
 function SidebarContent({
   information,
+  samples,
   activeField,
   handleScrollTo,
   router,
@@ -142,7 +147,27 @@ function SidebarContent({
             </span>
           </AccordionTrigger>
 
-          {section.items.length > 0 && (
+          {section.id === "testsamples" ? (
+            <AccordionContent>
+              <ul className="space-y-1 pl-2 text-sm">
+                {samples.map((sample, index) => {
+                  const label = `#${index + 1}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+                  return (
+                    <li key={sample.id}>
+                      <button
+                        onClick={() => handleScrollTo("Sample" + (index + 1), section.id)}
+                        className={cn(
+                          "text-left w-full text-sm rounded px-1 hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </AccordionContent>
+          ) : section.items.length > 0 ? (
             <AccordionContent>
               <ul className="space-y-1 pl-2 text-sm">
                 {section.items.map((item: string) => (
@@ -168,7 +193,7 @@ function SidebarContent({
                 ))}
               </ul>
             </AccordionContent>
-          )}
+          ) : null}
         </AccordionItem>
       ))}
     </Accordion>

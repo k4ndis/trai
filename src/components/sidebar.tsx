@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { useInformationStore, useSamplesStore, useUIStore } from "@/lib/store"
+import { useInformationStore, useUIStore } from "@/lib/store"
 import { useEffect, useState } from "react"
 
 const sections = [
@@ -30,7 +30,7 @@ const sections = [
   {
     id: "testsamples",
     label: "Test Samples",
-    items: [], // Dynamisch unten ergänzt
+    items: [],
   },
   {
     id: "testprocedure",
@@ -43,7 +43,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const information = useInformationStore((state) => state.fields)
-  const samples = useSamplesStore((state) => state.samples)
+  const samples = useInformationStore((state) => state.samples)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
   const [activeField, setActiveField] = useState<string | null>(null)
 
@@ -155,7 +155,7 @@ function SidebarContent({
                   return (
                     <li key={sample.id}>
                       <button
-                        onClick={() => handleScrollTo("Sample" + (index + 1), section.id)}
+                        onClick={() => handleScrollTo(`Sample ${index + 1}`, section.id)}
                         className={cn(
                           "text-left w-full text-sm rounded px-1 hover:bg-accent hover:text-accent-foreground"
                         )}

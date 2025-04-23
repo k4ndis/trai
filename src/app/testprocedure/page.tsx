@@ -362,6 +362,33 @@ export default function TestProcedurePage() {
               </div>
             )}
 
+            {/* Sample Selection */}
+            <div className="mt-4">
+              <Label className="mb-1 block">Assigned Samples</Label>
+              <div className="flex flex-wrap gap-3">
+                {samples.map((sample) => {
+                  const sampleLabel = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+                  const isSelected = seq.sampleIds?.includes(sample.id)
+            
+                  return (
+                    <label key={sample.id} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) => {
+                          const updatedIds = isSelected
+                            ? seq.sampleIds.filter((id) => id !== sample.id)
+                            : [...(seq.sampleIds || []), sample.id]
+            
+                          updateTestSequence(seq.id, "sampleIds", updatedIds)
+                        }}
+                      />
+                      {sampleLabel}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+
 
             {/* Preaging */}
             {seq.type === "Preaging" && (
@@ -411,6 +438,33 @@ export default function TestProcedurePage() {
                 </div>
               </div>
             )}
+
+            {/* Sample Selection */}
+            <div className="mt-4">
+              <Label className="mb-1 block">Assigned Samples</Label>
+              <div className="flex flex-wrap gap-3">
+                {samples.map((sample) => {
+                  const sampleLabel = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+                  const isSelected = seq.sampleIds?.includes(sample.id)
+            
+                  return (
+                    <label key={sample.id} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) => {
+                          const updatedIds = isSelected
+                            ? seq.sampleIds.filter((id) => id !== sample.id)
+                            : [...(seq.sampleIds || []), sample.id]
+            
+                          updateTestSequence(seq.id, "sampleIds", updatedIds)
+                        }}
+                      />
+                      {sampleLabel}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
            
             {/* Durability */}
             {seq.type === "Durability" && (
@@ -450,6 +504,33 @@ export default function TestProcedurePage() {
             )}
           </div>
         ))}
+
+        {/* Sample Selection */}
+        <div className="mt-4">
+          <Label className="mb-1 block">Assigned Samples</Label>
+          <div className="flex flex-wrap gap-3">
+            {samples.map((sample) => {
+              const sampleLabel = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+              const isSelected = seq.sampleIds?.includes(sample.id)
+        
+              return (
+                <label key={sample.id} className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={(checked) => {
+                      const updatedIds = isSelected
+                        ? seq.sampleIds.filter((id) => id !== sample.id)
+                        : [...(seq.sampleIds || []), sample.id]
+        
+                      updateTestSequence(seq.id, "sampleIds", updatedIds)
+                    }}
+                  />
+                  {sampleLabel}
+                </label>
+              )
+            })}
+          </div>
+        </div>
 
         <Button onClick={addTestSequence} className="mt-4">
           + Add Test Sequence

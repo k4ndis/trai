@@ -18,7 +18,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
-  sampleIds: number[] 
+  sampleIds: number[]
 }
 
 export interface SampleImage {
@@ -42,7 +42,11 @@ interface InformationState {
   updateField: (fieldId: string, value: string) => void
   updateMultipleFields: (newFields: InformationFields) => void
   setTestSequences: (sequences: TestSequence[]) => void
-  updateTestSequence: (id: number, field: keyof TestSequence, value: any) => void
+  updateTestSequence: (
+    id: number,
+    field: keyof TestSequence,
+    value: string | string[] | number | number[]
+  ) => void
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void
   removeSampleImage: (sampleId: number, imageUrl: string) => void

@@ -18,6 +18,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
+  sampleIds: number[] 
 }
 
 export interface SampleImage {
@@ -41,6 +42,7 @@ interface InformationState {
   updateField: (fieldId: string, value: string) => void
   updateMultipleFields: (newFields: InformationFields) => void
   setTestSequences: (sequences: TestSequence[]) => void
+  updateTestSequence: (id: number, field: keyof TestSequence, value: any) => void
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void
   removeSampleImage: (sampleId: number, imageUrl: string) => void
@@ -65,6 +67,12 @@ export const useInformationStore = create<InformationState>((set) => ({
       },
     })),
   setTestSequences: (sequences) => set({ testSequences: sequences }),
+  updateTestSequence: (id, field, value) =>
+    set((state) => ({
+      testSequences: state.testSequences.map((seq) =>
+        seq.id === id ? { ...seq, [field]: value } : seq
+      ),
+    })),
   setSamples: (samples) => set({ samples }),
   addSampleImage: (sampleId, image) =>
     set((state) => ({

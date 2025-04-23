@@ -5,7 +5,7 @@ interface InformationFields {
   [key: string]: string
 }
 
-interface TestSequence {
+export interface TestSequence {
   id: number
   type: string
   temperatures: string[]
@@ -20,12 +20,12 @@ interface TestSequence {
   comment: string
 }
 
-interface SampleImage {
+export interface SampleImage {
   url: string
   label: string
 }
 
-interface Sample {
+export interface Sample {
   id: number
   productNumber: string
   productionDate: string

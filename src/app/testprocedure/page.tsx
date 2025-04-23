@@ -144,6 +144,7 @@ export default function TestProcedurePage() {
         temperature: "",
         dwelltime: "",
         comment: "",
+        sampleIds: [],
       },
     ])
   }

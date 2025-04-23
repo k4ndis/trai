@@ -158,7 +158,7 @@ function SidebarContent({
                       <button
                         onClick={() => handleScrollTo(`Sample ${index + 1}`, section.id)}
                         className={cn(
-                          "text-left w-full text-sm rounded px-1 hover:bg-accent hover:text-accent-foreground"
+                          "text-left w-full text-xs text-muted-foreground rounded px-1 hover:bg-accent hover:text-accent-foreground"
                         )}
                       >
                         {label}

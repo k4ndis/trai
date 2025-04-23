@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useInformationStore, useUIStore } from "@/lib/store"
 import { useEffect, useState } from "react"
+import type { Sample } from "@/lib/store"
 
 const sections = [
   {
@@ -116,7 +117,7 @@ export function Sidebar() {
 
 type SidebarContentProps = {
   information: Record<string, string>
-  samples: any[]
+  samples: Sample[]
   activeField: string | null
   handleScrollTo: (id: string, sectionId: string) => void
   router: ReturnType<typeof useRouter>

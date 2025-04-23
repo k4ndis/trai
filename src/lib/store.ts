@@ -45,7 +45,7 @@ interface InformationState {
   updateTestSequence: (
     id: number,
     field: keyof TestSequence,
-    value: string | string[] | number | number[]
+    value: string | number | string[] | number[]
   ) => void
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void

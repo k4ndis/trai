@@ -152,7 +152,7 @@ function SidebarContent({
             <AccordionContent>
               <ul className="space-y-1 pl-2 text-sm">
                 {samples.map((sample, index) => {
-                  const label = `#${index + 1}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+                  const label = `#${index + 1} · ${sample.productNumber} · ${sample.productionDate} · ${sample.serialNumber}`
                   return (
                     <li key={sample.id}>
                       <button

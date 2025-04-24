@@ -390,9 +390,10 @@ export default function TestProcedurePage() {
                       <Checkbox
                         checked={isSelected}
                         onCheckedChange={() => {
+                          const currentIds = (seq.sampleIds || []).map(Number)
                           const updatedIds: number[] = isSelected
-                            ? (seq.sampleIds || []).filter((id) => id !== Number(sample.id))
-                            : [...(seq.sampleIds || []), Number(sample.id)]
+                            ? currentIds.filter((id) => id !== Number(sample.id))
+                            : [...currentIds, Number(sample.id)]
                         
                           updateTestSequence(seq.id, "sampleIds", updatedIds)
                         }}

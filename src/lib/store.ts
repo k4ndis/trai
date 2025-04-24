@@ -1,4 +1,5 @@
 // src/lib/store.ts
+// src/lib/store.ts
 import { create } from "zustand"
 
 interface InformationFields {
@@ -18,7 +19,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
-  sampleIds: number[]
+  sampleIds: number[] // <-- korrekt: immer ein Array von Zahlen
 }
 
 export interface SampleImage {

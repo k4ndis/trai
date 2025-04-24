@@ -147,7 +147,7 @@ export default function TestProcedurePage() {
   const updateTestSequence = (
     id: number,
     field: keyof TestSequence,
-    value: string | string[] | number
+    value: string | string[] | number | number[]
   ) => {
     const updated = testSequences.map((seq) =>
       seq.id === id ? { ...seq, [field]: value } : seq

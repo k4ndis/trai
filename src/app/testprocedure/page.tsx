@@ -404,7 +404,9 @@ export default function TestProcedurePage() {
                 })}
               </div>
             </div>
-
+          </div>
+        ))}
+        
         <Button onClick={addTestSequence} className="mt-4">
           + Add Test Sequence
         </Button>

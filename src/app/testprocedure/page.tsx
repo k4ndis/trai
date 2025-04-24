@@ -383,7 +383,7 @@ export default function TestProcedurePage() {
               <Label className="mb-1 block">Assigned Samples</Label>
               <div className="flex flex-wrap gap-3">
                 {samples.map((sample) => {
-                  const label = `#${sample.id}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
+                  const label = `#${sampleIndex + 1}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
                   const isSelected = seq.sampleIds?.includes(sample.id)
                   return (
                     <label key={sample.id} className="flex items-center gap-2 text-sm">

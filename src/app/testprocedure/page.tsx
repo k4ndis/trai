@@ -389,10 +389,11 @@ export default function TestProcedurePage() {
                     <label key={sample.id} className="flex items-center gap-2 text-sm">
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => {
-                          const updatedIds = isSelected
+                        onCheckedChange={(checked) => {
+                          const updatedIds: number[] = isSelected
                             ? seq.sampleIds.filter((id) => id !== sample.id)
                             : [...(seq.sampleIds || []), sample.id]
+                        
                           updateTestSequence(seq.id, "sampleIds", updatedIds)
                         }}
                       />

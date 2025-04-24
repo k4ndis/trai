@@ -382,7 +382,7 @@ export default function TestProcedurePage() {
             <div className="mt-4">
               <Label className="mb-1 block">Assigned Samples</Label>
               <div className="flex flex-wrap gap-3">
-                samples.map((sample, sampleIndex) => { ... })
+                {samples.map((sample, sampleIndex) => {
                   const label = `#${sampleIndex + 1}_${sample.productNumber}_${sample.productionDate}_${sample.serialNumber}`
                   const isSelected = seq.sampleIds?.includes(sample.id)
                   return (
@@ -394,7 +394,7 @@ export default function TestProcedurePage() {
                           const updatedIds: number[] = isSelected
                             ? currentIds.filter((id) => id !== Number(sample.id))
                             : [...currentIds, Number(sample.id)]
-                        
+            
                           updateTestSequence(seq.id, "sampleIds", updatedIds)
                         }}
                       />
@@ -404,8 +404,6 @@ export default function TestProcedurePage() {
                 })}
               </div>
             </div>
-          </div>
-        ))}
 
         <Button onClick={addTestSequence} className="mt-4">
           + Add Test Sequence

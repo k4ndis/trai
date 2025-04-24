@@ -395,7 +395,7 @@ export default function TestProcedurePage() {
                             ? currentIds.filter((id) => id !== Number(sample.id))
                             : [...currentIds, Number(sample.id)]
                         
-                          updateTestSequence(seq.id, "sampleIds", updatedIds as (number | string)[])
+                          updateTestSequence(seq.id, "sampleIds", updatedIds)
                         }}
                       />
                       {label}

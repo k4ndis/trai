@@ -18,7 +18,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
-  sampleIds: number[]
+  sampleIds: string | number | string[] | number[]
 }
 
 export interface SampleImage {

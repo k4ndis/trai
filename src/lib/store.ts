@@ -18,7 +18,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
-  sampleIds: number[] // Bleibt number[] (besser für saubere Daten)
+  sampleIds: number[]
 }
 
 export interface SampleImage {
@@ -45,7 +45,7 @@ interface InformationState {
   updateTestSequence: (
     id: number,
     field: keyof TestSequence,
-    value: any // <-- Hier als "any", damit auch number[] ohne Fehler durchkommt
+    value: string | number | string[] | number[]
   ) => void
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void

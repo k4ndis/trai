@@ -195,7 +195,7 @@ function SidebarContent({
                         {testSequences.map((seq, index) => (
                           <li key={seq.id}>
                             <button
-                              onClick={() => handleScrollTo(`testsequence`, section.id)}
+                              onClick={() => handleScrollTo("testsequence", section.id)}
                               className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent w-full text-left rounded px-1"
                             >
                               #{index + 1} {seq.type || "(unnamed)"}
@@ -203,6 +203,11 @@ function SidebarContent({
                           </li>
                         ))}
                       </ul>
+                    )}
+                    {information[item.toLowerCase().replace(/ /g, "")] && (
+                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
+                        {information[item.toLowerCase().replace(/ /g, "")]}
+                      </div>
                     )}
                   </li>
                 ))}

@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useInformationStore, useUIStore } from "@/lib/store"
 import { useEffect, useState } from "react"
-import type { Sample } from "@/lib/store"
+import type { Sample, TestSequence } from "@/lib/store"
 
 const sections = [
   {
@@ -45,6 +45,7 @@ export function Sidebar() {
   const router = useRouter()
   const information = useInformationStore((state) => state.fields)
   const samples = useInformationStore((state) => state.samples)
+  const testSequences = useInformationStore((state) => state.testSequences)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
   const [activeField, setActiveField] = useState<string | null>(null)
 
@@ -86,6 +87,7 @@ export function Sidebar() {
         <SidebarContent
           information={information}
           samples={samples}
+          testSequences={testSequences}
           activeField={activeField}
           handleScrollTo={handleScrollTo}
           router={router}
@@ -104,6 +106,7 @@ export function Sidebar() {
             <SidebarContent
               information={information}
               samples={samples}
+              testSequences={testSequences}
               activeField={activeField}
               handleScrollTo={handleScrollTo}
               router={router}
@@ -118,6 +121,7 @@ export function Sidebar() {
 type SidebarContentProps = {
   information: Record<string, string>
   samples: Sample[]
+  testSequences: TestSequence[]
   activeField: string | null
   handleScrollTo: (id: string, sectionId: string) => void
   router: ReturnType<typeof useRouter>
@@ -126,6 +130,7 @@ type SidebarContentProps = {
 function SidebarContent({
   information,
   samples,
+  testSequences,
   activeField,
   handleScrollTo,
   router,
@@ -166,6 +171,41 @@ function SidebarContent({
                     </li>
                   )
                 })}
+              </ul>
+            </AccordionContent>
+          ) : section.id === "testprocedure" ? (
+            <AccordionContent>
+              <ul className="space-y-1 pl-2 text-sm">
+                {section.items.map((item: string) => (
+                  <li key={item}>
+                    <button
+                      onClick={() => handleScrollTo(item, section.id)}
+                      className={cn(
+                        "text-left w-full text-sm rounded px-1",
+                        activeField?.toLowerCase().replace(/ /g, "") ===
+                          item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      {item}
+                    </button>
+                    {item === "Test Sequence" && testSequences.length > 0 && (
+                      <ul className="pl-2 mt-1 space-y-1">
+                        {testSequences.map((seq, index) => (
+                          <li key={seq.id}>
+                            <button
+                              onClick={() => handleScrollTo(`testsequence`, section.id)}
+                              className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent w-full text-left rounded px-1"
+                            >
+                              #{index + 1} {seq.type || "(unnamed)"}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
               </ul>
             </AccordionContent>
           ) : section.items.length > 0 ? (

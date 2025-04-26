@@ -41,6 +41,7 @@ interface InformationState {
   samples: Sample[]
   updateField: (fieldId: string, value: string) => void
   updateMultipleFields: (newFields: InformationFields) => void
+  setFields: (newFields: InformationFields) => void
   setTestSequences: (sequences: TestSequence[]) => void
   updateTestSequence: (
     id: number,
@@ -50,6 +51,9 @@ interface InformationState {
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void
   removeSampleImage: (sampleId: number, imageUrl: string) => void
+  clearFields: () => void
+  clearSamples: () => void
+  clearTestSequences: () => void
 }
 
 export const useInformationStore = create<InformationState>((set) => ({
@@ -69,6 +73,10 @@ export const useInformationStore = create<InformationState>((set) => ({
         ...state.fields,
         ...newFields,
       },
+    })),
+    setFields: (newFields) =>                     // <-- NEU
+    set(() => ({
+      fields: { ...newFields },
     })),
   setTestSequences: (sequences) => set({ testSequences: sequences }),
   updateTestSequence: (id, field, value) =>
@@ -92,7 +100,12 @@ export const useInformationStore = create<InformationState>((set) => ({
           : s
       ),
     })),
+  // ➡️ Hier kommen deine neuen Clear-Methoden:
+  clearFields: () => set({ fields: {} }),
+  clearSamples: () => set({ samples: [] }),
+  clearTestSequences: () => set({ testSequences: [] }),
 }))
+
 
 type UIState = {
   isMobileSidebarOpen: boolean

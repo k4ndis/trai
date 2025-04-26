@@ -1,3 +1,4 @@
+// src/app/dashboard/page.tsx
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -5,13 +6,15 @@ import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2, PencilLine } from "lucide-react"
+import { useInformationStore } from "@/lib/store"
 
 interface Report {
   id: string
   fields: {
+    report?: string
     project?: string
     product?: string
-    status?: string // Später evtl. ergänzen
+    status?: string
   }
   created_at: string
 }
@@ -20,6 +23,8 @@ export default function DashboardPage() {
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  const { clearFields, clearSamples, clearTestSequences, setFields, setSamples, setTestSequences } = useInformationStore()
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -70,17 +75,38 @@ export default function DashboardPage() {
     }
   }
 
-  const handleOpen = (id: string) => {
-    // Hier später noch Navigation und Laden der Daten verbessern
-    router.push("/information") // Gehe zu Information-Page
-    localStorage.setItem("currentReport", id) // (nur Übergangslösung, später schöner!)
+  const handleOpen = async (id: string) => {
+    const { data, error } = await supabase
+      .from("test_reports")
+      .select("*")
+      .eq("id", id)
+      .single()
+
+    if (error) {
+      alert("Error loading report: " + error.message)
+      return
+    }
+
+    if (data) {
+      setFields(data.fields || {})
+      setSamples(data.samples || [])
+      setTestSequences(data.test_sequences || [])
+      router.push("/information")
+    }
+  }
+
+  const handleCreateNew = () => {
+    clearFields()
+    clearSamples()
+    clearTestSequences()
+    router.push("/information")
   }
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Welcome back 👋</h1>
-        <Button onClick={() => router.push("/information")}>
+        <Button onClick={handleCreateNew}>
           <Plus className="w-4 h-4 mr-2" />
           Create New Report
         </Button>
@@ -103,7 +129,7 @@ export default function DashboardPage() {
             <tbody>
               {reports.map((report) => (
                 <tr key={report.id} className="border-t hover:bg-muted/20">
-                  <td className="p-3 font-mono">{report.id}</td>
+                  <td className="p-3 font-mono">{report.fields.report || report.id}</td>
                   <td className="p-3">{report.fields.project || "-"}</td>
                   <td className="p-3">{report.fields.product || "-"}</td>
                   <td className="p-3">{formatDate(report.created_at)}</td>

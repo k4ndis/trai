@@ -82,7 +82,7 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       <Input type="file" accept="image/*" onChange={onFileChange} />
 
       {imageSrc && (
-        <div className="relative w-full aspect-square bg-black mt-4">
+        <div className="relative w-full max-w-md aspect-[4/3] bg-black mt-4 mx-auto">
           <Cropper
             image={imageSrc}
             crop={crop}

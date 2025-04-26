@@ -97,9 +97,9 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
 
       {imageSrc && (
         <div className="space-y-2">
-          <Label>Bildbeschreibung</Label>
+          <Label>Comment</Label>
           <Textarea
-            placeholder="Beschreibung hier..."
+            placeholder="Comment"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />

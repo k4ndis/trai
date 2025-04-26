@@ -52,7 +52,7 @@ export function SampleSection({
     <div
       id="testsamples"
       tabIndex={-1}
-      className="border border-gray-700 rounded-xl p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+      className="rounded-xl p-4 mb-6"
     >
       <Label className="text-lg mb-4 block">Test Samples</Label>
 

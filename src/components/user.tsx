@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Moon, Sun, LogOut } from "lucide-react"
+import { Moon, Sun, LogOut, LayoutDashboard } from "lucide-react"
 import { useTheme } from "next-themes"
 import { supabase } from "@/lib/supabaseClient"
 import { useRouter } from "next/navigation"
@@ -58,6 +58,10 @@ export function UserMenu() {
         <div className="px-3 py-2 text-xs text-muted-foreground">
           {user.email}
         </div>
+        <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          My Dashboard
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >

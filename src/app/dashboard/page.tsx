@@ -2,7 +2,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"

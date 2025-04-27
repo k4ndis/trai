@@ -62,7 +62,7 @@ export function Topbar() {
     <>
       <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-2 px-2 py-1 border-b bg-background shadow-sm">
         {/* Left: Burger + Logo */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 pl-2">
           <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleMobileSidebar}>
             <Menu className="h-5 w-5" />
           </Button>

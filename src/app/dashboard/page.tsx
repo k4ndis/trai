@@ -128,9 +128,8 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Welcome + Create Button */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Welcome back 👋</h1>
+      {/* Create New Report Button ganz oben */}
+      <div className="flex justify-end">
         <Button onClick={handleCreateNew}>
           <Plus className="w-4 h-4 mr-2" />
           Create New Report

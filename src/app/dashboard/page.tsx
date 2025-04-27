@@ -93,10 +93,29 @@ export default function DashboardPage() {
     router.push("/information")
   }
 
-  const handleOpen = (id: string) => {
-    localStorage.setItem("currentReport", id)
+  const handleOpen = async (id: string) => {
+    const { setFields, setSamples, setTestSequences } = useInformationStore.getState()
+  
+    const { data, error } = await supabase
+      .from("test_reports")
+      .select("*")
+      .eq("id", id)
+      .single()
+  
+    if (error || !data) {
+      toast.error("Failed to load report: " + (error?.message || "Unknown error"))
+      return
+    }
+  
+    // Lade die Felder in den Store
+    setFields(data.fields || {})
+    setSamples(data.samples || [])
+    setTestSequences(data.testSequences || [])
+  
+    toast.success("Report loaded successfully!")
+  
     router.push("/information")
-  }
+  }  
 
   const filteredReports = reports.filter((report) => {
     if (filter === "completed") {

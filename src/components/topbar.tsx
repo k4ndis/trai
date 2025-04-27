@@ -60,19 +60,19 @@ export function Topbar() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4 px-4 py-2 border-b bg-background shadow-sm">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-background shadow-sm">
         {/* Left: Burger + Logo */}
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleMobileSidebar}>
             <Menu className="h-5 w-5" />
           </Button>
-          <Link href="/" className="relative w-12 h-8">
+          <Link href="/" className="relative w-16 h-12">
             <Image src="/logo.png" alt="TRAI Logo" fill className="object-contain" priority />
           </Link>
         </div>
 
-        {/* Right: Search Icon + Save + UserMenu */}
-        <div className="flex items-center gap-2">
+        {/* Right: Search + Save + UserMenu */}
+        <div className="flex items-center gap-2 ml-auto">
           <Button variant="ghost" size="icon" onClick={openSearch}>
             <Search className="h-5 w-5" />
           </Button>

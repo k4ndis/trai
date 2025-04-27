@@ -2,17 +2,18 @@
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function DELETE(req: NextRequest) {
   const { filePath } = await req.json()
 
   if (!filePath) {
     return NextResponse.json({ error: "Kein Pfad angegeben" }, { status: 400 })
   }
+
+  // 👉 Supabase-Client erst hier erstellen:
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   const { error } = await supabaseAdmin.storage.from("trai").remove([filePath])
 

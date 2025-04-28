@@ -56,6 +56,7 @@ export function Sidebar() {
   const samples = useInformationStore((state) => state.samples)
   const testSequences = useInformationStore((state) => state.testSequences)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
+  const [activeSection, setActiveSection] = useState<string>("information")
   const [activeField, setActiveField] = useState<string | null>(null)
 
   useEffect(() => {
@@ -69,14 +70,15 @@ export function Sidebar() {
     return () => window.removeEventListener("focusin", handle)
   }, [])
 
-  const handleNavigation = (sectionId: string) => {
+  const handleSectionClick = (sectionId: string) => {
+    setActiveSection(sectionId)
     if (pathname !== `/${sectionId}`) {
       router.push(`/${sectionId}`)
     }
     closeMobileSidebar()
   }
 
-  const handleScrollTo = (id: string, sectionId: string) => {
+  const handleScrollTo = (id: string) => {
     const idNormalized = id.toLowerCase().replace(/ /g, "")
     const scrollAndFocus = () => {
       const el = document.getElementById(idNormalized)
@@ -88,90 +90,80 @@ export function Sidebar() {
         requestAnimationFrame(scrollAndFocus)
       }
     }
-
-    if (pathname === `/${sectionId}`) {
-      setTimeout(scrollAndFocus, 100)
-    } else {
-      router.push(`/${sectionId}`)
-      setTimeout(scrollAndFocus, 500)
-    }
+    setTimeout(scrollAndFocus, 100)
   }
+
+  const currentSection = sections.find((s) => s.id === activeSection)
 
   return (
     <>
-      <aside className="group fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted/40 transition-all duration-300 hover:w-64 w-16 overflow-hidden hidden md:flex">
+      {/* Haupt-Sidebar */}
+      <aside className="fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted/40 w-16 md:flex">
         <nav className="flex flex-col gap-2 p-4">
           {sections.map((section) => {
             const Icon = section.icon
+            const isActive = activeSection === section.id
             return (
-              <div key={section.id}>
-                <button
-                  onClick={() => handleNavigation(section.id)}
-                  className={cn(
-                    "flex items-center gap-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full"
-                  )}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span className="truncate text-left text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                    {section.label}
-                  </span>
-                </button>
-
-                {/* Dynamische Unterlisten bei Hover sichtbar */}
-                {section.id === "information" &&
-                  section.items.map((item) => (
-                    <div
-                      key={item}
-                      className="ml-10 mt-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <button
-                        onClick={() => handleScrollTo(item, section.id)}
-                        className={cn(
-                          "text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded px-1 text-left",
-                          activeField === item.toLowerCase().replace(/ /g, "")
-                            ? "bg-accent text-accent-foreground font-semibold"
-                            : ""
-                        )}
-                      >
-                        {item}
-                      </button>
-                    </div>
-                  ))}
-
-                {section.id === "testsamples" && samples.length > 0 && (
-                  <div className="ml-10 mt-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {samples.map((sample: Sample, index: number) => (
-                      <button
-                        key={sample.id}
-                        onClick={() => handleScrollTo(`Sample ${index + 1}`, section.id)}
-                        className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded px-1 text-left"
-                      >
-                        #{index + 1} · {sample.productNumber}
-                      </button>
-                    ))}
-                  </div>
+              <button
+                key={section.id}
+                onClick={() => handleSectionClick(section.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors",
+                  isActive && "bg-accent text-accent-foreground"
                 )}
-
-                {section.id === "testprocedure" && testSequences.length > 0 && (
-                  <div className="ml-10 mt-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {testSequences.map((seq: TestSequence, index: number) => (
-                      <button
-                        key={seq.id}
-                        onClick={() => handleScrollTo("testsequence", section.id)}
-                        className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded px-1 text-left"
-                      >
-                        #{index + 1} {seq.type || "(unnamed)"}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              >
+                <Icon className="h-5 w-5" />
+                <span className="text-[10px] font-medium">{section.label}</span>
+              </button>
             )
           })}
         </nav>
       </aside>
 
-      {/* Mobile Sidebar */}
+      {/* Sub-Sidebar */}
+      <aside className="fixed top-14 left-16 z-10 flex h-screen flex-col border-r bg-muted/20 w-48 md:flex p-4">
+        <nav className="flex flex-col gap-2">
+          {currentSection?.id === "information" &&
+            currentSection.items.map((item) => (
+              <button
+                key={item}
+                onClick={() => handleScrollTo(item)}
+                className={cn(
+                  "text-left text-sm rounded px-2 py-1",
+                  activeField === item.toLowerCase().replace(/ /g, "")
+                    ? "bg-accent text-accent-foreground font-semibold"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                )}
+              >
+                {item}
+              </button>
+            ))}
+
+          {currentSection?.id === "testsamples" &&
+            samples.map((sample, index) => (
+              <button
+                key={sample.id}
+                onClick={() => handleScrollTo(`Sample ${index + 1}`)}
+                className="text-left text-sm text-muted-foreground rounded px-2 py-1 hover:bg-accent hover:text-accent-foreground"
+              >
+                #{index + 1} · {sample.productNumber}
+              </button>
+            ))}
+
+          {currentSection?.id === "testprocedure" &&
+            testSequences.map((seq, index) => (
+              <button
+                key={seq.id}
+                onClick={() => handleScrollTo("testsequence")}
+                className="text-left text-sm text-muted-foreground rounded px-2 py-1 hover:bg-accent hover:text-accent-foreground"
+              >
+                #{index + 1} {seq.type || "(unnamed)"}
+              </button>
+            ))}
+        </nav>
+      </aside>
+
+      {/* Mobile Sidebar (nur Hauptnavigation sichtbar) */}
       {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
@@ -187,7 +179,7 @@ export function Sidebar() {
                 return (
                   <button
                     key={section.id}
-                    onClick={() => handleNavigation(section.id)}
+                    onClick={() => handleSectionClick(section.id)}
                     className="flex items-center gap-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full"
                   >
                     <Icon className="h-5 w-5 shrink-0" />

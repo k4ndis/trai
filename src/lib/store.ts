@@ -1,5 +1,6 @@
 // src/lib/store.ts
 import { create } from "zustand"
+import { persist } from "zustand/middleware" // ✅ hinzugefügt
 
 interface InformationFields {
   [key: string]: string
@@ -18,7 +19,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
-  sampleIds: number[] // <-- korrekt: immer ein Array von Zahlen
+  sampleIds: number[]
 }
 
 export interface SampleImage {
@@ -56,57 +57,69 @@ interface InformationState {
   clearTestSequences: () => void
 }
 
-export const useInformationStore = create<InformationState>((set) => ({
-  fields: {},
-  testSequences: [],
-  samples: [],
-  updateField: (fieldId, value) =>
-    set((state) => ({
-      fields: {
-        ...state.fields,
-        [fieldId]: value,
-      },
-    })),
-  updateMultipleFields: (newFields) =>
-    set((state) => ({
-      fields: {
-        ...state.fields,
-        ...newFields,
-      },
-    })),
-    setFields: (newFields) =>                     // <-- NEU
-    set(() => ({
-      fields: { ...newFields },
-    })),
-  setTestSequences: (sequences) => set({ testSequences: sequences }),
-  updateTestSequence: (id, field, value) =>
-    set((state) => ({
-      testSequences: state.testSequences.map((seq) =>
-        seq.id === id ? { ...seq, [field]: value } : seq
-      ),
-    })),
-  setSamples: (samples) => set({ samples }),
-  addSampleImage: (sampleId, image) =>
-    set((state) => ({
-      samples: state.samples.map((s) =>
-        s.id === sampleId ? { ...s, images: [...(s.images || []), image] } : s
-      ),
-    })),
-  removeSampleImage: (sampleId, imageUrl) =>
-    set((state) => ({
-      samples: state.samples.map((s) =>
-        s.id === sampleId
-          ? { ...s, images: s.images.filter((img) => img.url !== imageUrl) }
-          : s
-      ),
-    })),
-  // ➡️ Hier kommen deine neuen Clear-Methoden:
-  clearFields: () => set({ fields: {} }),
-  clearSamples: () => set({ samples: [] }),
-  clearTestSequences: () => set({ testSequences: [] }),
-}))
+// ✅ Nur hier sauber persist ergänzt
+export const useInformationStore = create<InformationState>()(
+  persist(
+    (set) => ({
+      fields: {},
+      testSequences: [],
+      samples: [],
+      updateField: (fieldId, value) =>
+        set((state) => ({
+          fields: {
+            ...state.fields,
+            [fieldId]: value,
+          },
+        })),
+      updateMultipleFields: (newFields) =>
+        set((state) => ({
+          fields: {
+            ...state.fields,
+            ...newFields,
+          },
+        })),
+      setFields: (newFields) =>
+        set(() => ({
+          fields: { ...newFields },
+        })),
+      setTestSequences: (sequences) => set({ testSequences: sequences }),
+      updateTestSequence: (id, field, value) =>
+        set((state) => ({
+          testSequences: state.testSequences.map((seq) =>
+            seq.id === id ? { ...seq, [field]: value } : seq
+          ),
+        })),
+      setSamples: (samples) => set({ samples }),
+      addSampleImage: (sampleId, image) =>
+        set((state) => ({
+          samples: state.samples.map((s) =>
+            s.id === sampleId ? { ...s, images: [...(s.images || []), image] } : s
+          ),
+        })),
+      removeSampleImage: (sampleId, imageUrl) =>
+        set((state) => ({
+          samples: state.samples.map((s) =>
+            s.id === sampleId
+              ? { ...s, images: s.images.filter((img) => img.url !== imageUrl) }
+              : s
+          ),
+        })),
+      clearFields: () => set({ fields: {} }),
+      clearSamples: () => set({ samples: [] }),
+      clearTestSequences: () => set({ testSequences: [] }),
+    }),
+    {
+      name: "information-store", // Key im LocalStorage
+      partialize: (state) => ({
+        fields: state.fields,
+        testSequences: state.testSequences,
+        samples: state.samples,
+      }),
+    }
+  )
+)
 
-
+// UI-Store bleibt unverändert ✅
 type UIState = {
   isMobileSidebarOpen: boolean
   isSearchOpen: boolean

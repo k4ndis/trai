@@ -1,3 +1,4 @@
+// src/components/sidebar.tsx
 "use client"
 
 import {
@@ -30,12 +31,12 @@ const sections = [
   },
   {
     id: "testsamples",
-    label: "Test Samples",
+    label: "Samples",
     items: [],
   },
   {
     id: "testprocedure",
-    label: "Test Procedure",
+    label: "Procedure",
     items: ["Test Type", "Test Sequence"],
   },
 ]

@@ -1,5 +1,6 @@
 // src/lib/store.ts
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 interface InformationFields {
   [key: string]: string
@@ -18,7 +19,7 @@ export interface TestSequence {
   temperature: string
   dwelltime: string
   comment: string
-  sampleIds: number[] // <-- korrekt: immer ein Array von Zahlen
+  sampleIds: number[]
 }
 
 export interface SampleImage {
@@ -41,7 +42,6 @@ interface InformationState {
   samples: Sample[]
   updateField: (fieldId: string, value: string) => void
   updateMultipleFields: (newFields: InformationFields) => void
-  setFields: (newFields: InformationFields) => void
   setTestSequences: (sequences: TestSequence[]) => void
   updateTestSequence: (
     id: number,
@@ -51,61 +51,62 @@ interface InformationState {
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void
   removeSampleImage: (sampleId: number, imageUrl: string) => void
-  clearFields: () => void
-  clearSamples: () => void
-  clearTestSequences: () => void
 }
 
-export const useInformationStore = create<InformationState>((set) => ({
-  fields: {},
-  testSequences: [],
-  samples: [],
-  updateField: (fieldId, value) =>
-    set((state) => ({
-      fields: {
-        ...state.fields,
-        [fieldId]: value,
-      },
-    })),
-  updateMultipleFields: (newFields) =>
-    set((state) => ({
-      fields: {
-        ...state.fields,
-        ...newFields,
-      },
-    })),
-    setFields: (newFields) =>                     // <-- NEU
-    set(() => ({
-      fields: { ...newFields },
-    })),
-  setTestSequences: (sequences) => set({ testSequences: sequences }),
-  updateTestSequence: (id, field, value) =>
-    set((state) => ({
-      testSequences: state.testSequences.map((seq) =>
-        seq.id === id ? { ...seq, [field]: value } : seq
-      ),
-    })),
-  setSamples: (samples) => set({ samples }),
-  addSampleImage: (sampleId, image) =>
-    set((state) => ({
-      samples: state.samples.map((s) =>
-        s.id === sampleId ? { ...s, images: [...(s.images || []), image] } : s
-      ),
-    })),
-  removeSampleImage: (sampleId, imageUrl) =>
-    set((state) => ({
-      samples: state.samples.map((s) =>
-        s.id === sampleId
-          ? { ...s, images: s.images.filter((img) => img.url !== imageUrl) }
-          : s
-      ),
-    })),
-  // ➡️ Hier kommen deine neuen Clear-Methoden:
-  clearFields: () => set({ fields: {} }),
-  clearSamples: () => set({ samples: [] }),
-  clearTestSequences: () => set({ testSequences: [] }),
-}))
-
+// ➔ Jetzt mit persist für InformationStore
+export const useInformationStore = create<InformationState>()(
+  persist(
+    (set) => ({
+      fields: {},
+      testSequences: [],
+      samples: [],
+      updateField: (fieldId, value) =>
+        set((state) => ({
+          fields: {
+            ...state.fields,
+            [fieldId]: value,
+          },
+        })),
+      updateMultipleFields: (newFields) =>
+        set((state) => ({
+          fields: {
+            ...state.fields,
+            ...newFields,
+          },
+        })),
+      setTestSequences: (sequences) => set({ testSequences: sequences }),
+      updateTestSequence: (id, field, value) =>
+        set((state) => ({
+          testSequences: state.testSequences.map((seq) =>
+            seq.id === id ? { ...seq, [field]: value } : seq
+          ),
+        })),
+      setSamples: (samples) => set({ samples }),
+      addSampleImage: (sampleId, image) =>
+        set((state) => ({
+          samples: state.samples.map((s) =>
+            s.id === sampleId ? { ...s, images: [...(s.images || []), image] } : s
+          ),
+        })),
+      removeSampleImage: (sampleId, imageUrl) =>
+        set((state) => ({
+          samples: state.samples.map((s) =>
+            s.id === sampleId
+              ? { ...s, images: s.images.filter((img) => img.url !== imageUrl) }
+              : s
+          ),
+        })),
+    }),
+    {
+      name: "information-storage", // <-- Local Storage key
+      partialize: (state) => ({
+        fields: state.fields,
+        testSequences: state.testSequences,
+        samples: state.samples,
+      }),
+    }
+  )
+)
 
 type UIState = {
   isMobileSidebarOpen: boolean
@@ -116,12 +117,20 @@ type UIState = {
   closeSearch: () => void
 }
 
-export const useUIStore = create<UIState>((set) => ({
-  isMobileSidebarOpen: false,
-  isSearchOpen: false,
-  toggleMobileSidebar: () =>
-    set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
-  closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
-  openSearch: () => set({ isSearchOpen: true }),
-  closeSearch: () => set({ isSearchOpen: false }),
-}))
+// ➔ Auch UIStore speichern (optional aber nice!)
+export const useUIStore = create<UIState>()(
+  persist(
+    (set) => ({
+      isMobileSidebarOpen: false,
+      isSearchOpen: false,
+      toggleMobileSidebar: () =>
+        set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
+      closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
+      openSearch: () => set({ isSearchOpen: true }),
+      closeSearch: () => set({ isSearchOpen: false }),
+    }),
+    {
+      name: "ui-storage",
+    }
+  )
+)

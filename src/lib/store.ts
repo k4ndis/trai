@@ -1,6 +1,7 @@
 // src/lib/store.ts
 import { create } from "zustand"
-import { persist } from "zustand/middleware" // ✅ hinzugefügt
+import { persist } from "zustand/middleware"
+import { Session } from "@supabase/supabase-js"
 
 interface InformationFields {
   [key: string]: string
@@ -57,7 +58,6 @@ interface InformationState {
   clearTestSequences: () => void
 }
 
-// ✅ Nur hier sauber persist ergänzt
 export const useInformationStore = create<InformationState>()(
   persist(
     (set) => ({
@@ -109,7 +109,7 @@ export const useInformationStore = create<InformationState>()(
       clearTestSequences: () => set({ testSequences: [] }),
     }),
     {
-      name: "information-store", // Key im LocalStorage
+      name: "information-store", 
       partialize: (state) => ({
         fields: state.fields,
         testSequences: state.testSequences,
@@ -119,7 +119,6 @@ export const useInformationStore = create<InformationState>()(
   )
 )
 
-// UI-Store bleibt unverändert ✅
 type UIState = {
   isMobileSidebarOpen: boolean
   isSearchOpen: boolean
@@ -138,3 +137,20 @@ export const useUIStore = create<UIState>((set) => ({
   openSearch: () => set({ isSearchOpen: true }),
   closeSearch: () => set({ isSearchOpen: false }),
 }))
+
+type AuthState = {
+  session: Session | null
+  setSession: (session: Session | null) => void
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      session: null,
+      setSession: (session) => set({ session }),
+    }),
+    {
+      name: "auth-store", // Wird in localStorage gespeichert
+    }
+  )
+)

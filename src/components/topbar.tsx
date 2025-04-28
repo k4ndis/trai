@@ -1,3 +1,4 @@
+// src/components/topbar.tsx
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -11,9 +12,11 @@ import { useRouter } from "next/navigation"
 import { useInformationStore, useUIStore } from "@/lib/store"
 import { UserMenu } from "@/components/user"
 import { SearchDialog } from "@/components/search"
+import { useAuthStore } from "@/lib/store"
 
 export function Topbar() {
-  const [user, setUser] = useState<User | null>(null)
+  const { session, setSession } = useAuthStore()
+  const user = session?.user || null
   const { toggleMobileSidebar, openSearch } = useUIStore()
   const router = useRouter()
 
@@ -22,7 +25,7 @@ export function Topbar() {
       const {
         data: { session },
       } = await supabase.auth.getSession()
-      setUser(session?.user || null)
+      setSession(session)
     }
 
     getUser()
@@ -30,7 +33,7 @@ export function Topbar() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null)
+      setSession(session)
       if (_event === "SIGNED_IN") router.push("/")
     })
 

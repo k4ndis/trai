@@ -202,22 +202,25 @@ export default function TestProcedurePage() {
       >
         <Label className="text-lg mb-2 block">Test Type</Label>
         {!testType && (
-          <Select
-            value={testType}
-            onValueChange={(value) => {
-              update("testtype", value)
-            }}
-          >
-            <SelectTrigger className="w-[300px]">
-              <SelectValue placeholder="Please select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Endurance">Endurance</SelectItem>
-              <SelectItem value="Vibration">Vibration</SelectItem>
-              <SelectItem value="Aging">Aging</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="w-full max-w-sm">
+            <Select
+              value={testType}
+              onValueChange={(value) => {
+                update("testtype", value)
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Please select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Endurance">Endurance</SelectItem>
+                <SelectItem value="Vibration">Vibration</SelectItem>
+                <SelectItem value="Aging">Aging</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         )}
+
 
         {testType && (
           <div className="flex gap-4 items-center mt-2">
@@ -258,11 +261,12 @@ export default function TestProcedurePage() {
             </div>
 
             {!seq.type && (
+            <div className="w-full max-w-sm">
               <Select
                 value={seq.type}
                 onValueChange={(value) => updateTestSequence(seq.id, "type", value)}
               >
-                <SelectTrigger className="w-[300px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Select test type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -271,7 +275,8 @@ export default function TestProcedurePage() {
                   <SelectItem value="Durability">Durability</SelectItem>
                 </SelectContent>
               </Select>
-            )}
+            </div>
+          )}
 
             {seq.type && (
               <div className="flex flex-wrap gap-6 items-center mt-2">

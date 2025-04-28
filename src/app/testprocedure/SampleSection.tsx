@@ -53,9 +53,9 @@ export function SampleSection({
     <div
       id="testsamples"
       tabIndex={-1}
-      className="rounded-xl p-4 mb-6 flex flex-col items-center"
+      className="px-4 md:px-8 lg:px-12 py-4 flex justify-center"
     >
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-7xl">
         <Label className="text-lg mb-4 block">Test Samples</Label>
 
         {samples.map((sample, index) => (

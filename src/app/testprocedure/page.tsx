@@ -379,6 +379,22 @@ export default function TestProcedurePage() {
                     onChange={(e) => updateTestSequence(seq.id, "comment", e.target.value)}
                   />
                 </div>
+                <div>
+                  <Label className="mb-1 block">Start Date</Label>
+                  <Input
+                    type="date"
+                    value={seq.startDate}
+                    onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1 block">End Date</Label>
+                  <Input
+                    type="date"
+                    value={seq.endDate}
+                    onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                  />
+                </div>
               </div>
             )}
 
@@ -411,9 +427,24 @@ export default function TestProcedurePage() {
                     onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
                   />
                 </div>
+                <div>
+                  <Label className="mb-1 block">Start Date</Label>
+                  <Input
+                    type="date"
+                    value={seq.startDate}
+                    onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="mb-1 block">End Date</Label>
+                  <Input
+                    type="date"
+                    value={seq.endDate}
+                    onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                  />
+                </div>
               </div>
             )}
-
 
             <div className="mt-4">
               <Label className="mb-1 block">Assigned Samples</Label>

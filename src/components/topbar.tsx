@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button"
 import { LogIn, Menu, Search } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"
-import { User } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
 import { useInformationStore, useUIStore } from "@/lib/store"
 import { UserMenu } from "@/components/user"
@@ -38,7 +37,7 @@ export function Topbar() {
     })
 
     return () => subscription.unsubscribe()
-  }, [router])
+  }, [router, setSession])
 
   const handleSave = async () => {
     if (!user) return alert("You are not logged in.")

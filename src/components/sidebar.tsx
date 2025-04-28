@@ -152,7 +152,7 @@ export function Sidebar() {
                 <Plus className="h-4 w-4" />
                 Add Sample
               </button>
-              {samples.map((sample, index) => (
+              {samples.map((sample: Sample, index: number) => (
                 <button
                   key={sample.id}
                   onClick={() => handleScrollTo(`Sample ${index + 1}`)}
@@ -165,7 +165,7 @@ export function Sidebar() {
           )}
 
           {currentSection?.id === "testprocedure" &&
-            testSequences.map((seq, index) => (
+            testSequences.map((seq: TestSequence, index: number) => (
               <button
                 key={seq.id}
                 onClick={() => handleScrollTo("testsequence")}

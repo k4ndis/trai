@@ -16,6 +16,7 @@ import {
 import { X } from "lucide-react"
 import { useInformationStore } from "@/lib/store"
 import { supabase } from "@/lib/supabaseClient"
+import { Container } from "@/components/container"
 
 interface TestSequence {
   id: number
@@ -193,7 +194,7 @@ export default function TestProcedurePage() {
   }
 
   return (
-    <div className="space-y-10">
+    <Container className="space-y-10">
       <div
         id="testtype"
         tabIndex={-1}
@@ -489,6 +490,6 @@ export default function TestProcedurePage() {
           + Add Test Sequence
         </Button>
       </div>
-    </div>
+      </Container>
   )
 }

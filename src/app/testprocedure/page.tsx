@@ -1,3 +1,4 @@
+// src/app/testprocedure/page.tsx
 "use client"
 
 import { useMemo, useEffect } from "react"
@@ -196,7 +197,7 @@ export default function TestProcedurePage() {
       <div
         id="testtype"
         tabIndex={-1}
-        className="border border-gray-700 rounded-xl p-4 mb-6"
+        className="rounded-xl p-4 mb-6"
       >
         <Label className="text-lg mb-2 block">Test Type</Label>
         {!testType && (
@@ -241,7 +242,7 @@ export default function TestProcedurePage() {
             <div
         id="testsequence"
         tabIndex={-1}
-        className="border border-gray-700 rounded-xl p-4 mb-6"
+        className="rounded-xl p-4 mb-6"
       >
         <Label className="text-lg">Test Sequences</Label>
         {testSequences.map((seq, index) => (

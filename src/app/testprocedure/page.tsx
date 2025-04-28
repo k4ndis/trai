@@ -331,6 +331,7 @@ export default function TestProcedurePage() {
                     type="date"
                     value={seq.startDate}
                     onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -339,6 +340,7 @@ export default function TestProcedurePage() {
                     type="date"
                     value={seq.endDate}
                     onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
               </div>
@@ -353,6 +355,7 @@ export default function TestProcedurePage() {
                     placeholder="Cycles"
                     value={seq.cycles}
                     onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -361,6 +364,7 @@ export default function TestProcedurePage() {
                     placeholder="Temperature"
                     value={seq.temperature}
                     onChange={(e) => updateTestSequence(seq.id, "temperature", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -369,6 +373,7 @@ export default function TestProcedurePage() {
                     placeholder="Dwell Time"
                     value={seq.dwelltime}
                     onChange={(e) => updateTestSequence(seq.id, "dwelltime", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -377,6 +382,7 @@ export default function TestProcedurePage() {
                     placeholder="Comment"
                     value={seq.comment}
                     onChange={(e) => updateTestSequence(seq.id, "comment", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -385,6 +391,7 @@ export default function TestProcedurePage() {
                     type="date"
                     value={seq.startDate}
                     onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -393,6 +400,7 @@ export default function TestProcedurePage() {
                     type="date"
                     value={seq.endDate}
                     onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
               </div>
@@ -425,6 +433,7 @@ export default function TestProcedurePage() {
                     placeholder="Cycles"
                     value={seq.cycles}
                     onChange={(e) => updateTestSequence(seq.id, "cycles", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -433,6 +442,7 @@ export default function TestProcedurePage() {
                     type="date"
                     value={seq.startDate}
                     onChange={(e) => updateTestSequence(seq.id, "startDate", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
                 <div>
@@ -441,6 +451,7 @@ export default function TestProcedurePage() {
                     type="date"
                     value={seq.endDate}
                     onChange={(e) => updateTestSequence(seq.id, "endDate", e.target.value)}
+                    className="max-w-sm"
                   />
                 </div>
               </div>

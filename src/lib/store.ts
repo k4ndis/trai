@@ -6,6 +6,20 @@ interface InformationFields {
   [key: string]: string
 }
 
+export interface SampleImage {
+  url: string
+  label: string
+}
+
+export interface Sample {
+  id: number
+  productNumber: string
+  productionDate: string
+  serialNumber: string
+  features: string
+  images: SampleImage[]
+}
+
 export interface TestSequence {
   id: number
   type: string
@@ -22,20 +36,6 @@ export interface TestSequence {
   sampleIds: number[]
 }
 
-export interface SampleImage {
-  url: string
-  label: string
-}
-
-export interface Sample {
-  id: number
-  productNumber: string
-  productionDate: string
-  serialNumber: string
-  features: string
-  images: SampleImage[]
-}
-
 interface InformationState {
   fields: InformationFields
   testSequences: TestSequence[]
@@ -46,14 +46,16 @@ interface InformationState {
   updateTestSequence: (
     id: number,
     field: keyof TestSequence,
-    value: string | number | string[] | number[]
+    value: string | string[] | number | number[]
   ) => void
   setSamples: (samples: Sample[]) => void
   addSampleImage: (sampleId: number, image: SampleImage) => void
   removeSampleImage: (sampleId: number, imageUrl: string) => void
+  clearFields: () => void
+  clearSamples: () => void
+  clearTestSequences: () => void
 }
 
-// ➔ Jetzt mit persist für InformationStore
 export const useInformationStore = create<InformationState>()(
   persist(
     (set) => ({
@@ -84,26 +86,29 @@ export const useInformationStore = create<InformationState>()(
       setSamples: (samples) => set({ samples }),
       addSampleImage: (sampleId, image) =>
         set((state) => ({
-          samples: state.samples.map((s) =>
-            s.id === sampleId ? { ...s, images: [...(s.images || []), image] } : s
+          samples: state.samples.map((sample) =>
+            sample.id === sampleId
+              ? { ...sample, images: [...sample.images, image] }
+              : sample
           ),
         })),
       removeSampleImage: (sampleId, imageUrl) =>
         set((state) => ({
-          samples: state.samples.map((s) =>
-            s.id === sampleId
-              ? { ...s, images: s.images.filter((img) => img.url !== imageUrl) }
-              : s
+          samples: state.samples.map((sample) =>
+            sample.id === sampleId
+              ? {
+                  ...sample,
+                  images: sample.images.filter((img) => img.url !== imageUrl),
+                }
+              : sample
           ),
         })),
+      clearFields: () => set({ fields: {} }),
+      clearSamples: () => set({ samples: [] }),
+      clearTestSequences: () => set({ testSequences: [] }),
     }),
     {
-      name: "information-storage", // <-- Local Storage key
-      partialize: (state) => ({
-        fields: state.fields,
-        testSequences: state.testSequences,
-        samples: state.samples,
-      }),
+      name: "information-storage",
     }
   )
 )
@@ -117,20 +122,12 @@ type UIState = {
   closeSearch: () => void
 }
 
-// ➔ Auch UIStore speichern (optional aber nice!)
-export const useUIStore = create<UIState>()(
-  persist(
-    (set) => ({
-      isMobileSidebarOpen: false,
-      isSearchOpen: false,
-      toggleMobileSidebar: () =>
-        set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
-      closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
-      openSearch: () => set({ isSearchOpen: true }),
-      closeSearch: () => set({ isSearchOpen: false }),
-    }),
-    {
-      name: "ui-storage",
-    }
-  )
-)
+export const useUIStore = create<UIState>((set) => ({
+  isMobileSidebarOpen: false,
+  isSearchOpen: false,
+  toggleMobileSidebar: () =>
+    set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
+  closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
+  openSearch: () => set({ isSearchOpen: true }),
+  closeSearch: () => set({ isSearchOpen: false }),
+}))

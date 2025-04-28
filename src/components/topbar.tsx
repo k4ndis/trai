@@ -33,7 +33,9 @@ export function Topbar() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
-      if (_event === "SIGNED_IN") router.push("/")
+      if (_event === "SIGNED_IN" && window.location.pathname === "/auth") {
+        router.push("/")
+      }      
     })
 
     return () => subscription.unsubscribe()

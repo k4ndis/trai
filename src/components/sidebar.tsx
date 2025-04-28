@@ -62,7 +62,7 @@ export function Sidebar() {
     const handle = () => {
       const activeEl = document.activeElement as HTMLElement | null
       if (activeEl?.id) {
-        setActiveField(activeEl.id)
+        setActiveField(activeEl.id.toLowerCase().replace(/ /g, ""))
       }
     }
     window.addEventListener("focusin", handle)
@@ -118,6 +118,26 @@ export function Sidebar() {
                 </button>
 
                 {/* Dynamische Unterlisten bei Hover sichtbar */}
+                {section.id === "information" &&
+                  section.items.map((item) => (
+                    <div
+                      key={item}
+                      className="ml-10 mt-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <button
+                        onClick={() => handleScrollTo(item, section.id)}
+                        className={cn(
+                          "text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded px-1 text-left",
+                          activeField === item.toLowerCase().replace(/ /g, "")
+                            ? "bg-accent text-accent-foreground font-semibold"
+                            : ""
+                        )}
+                      >
+                        {item}
+                      </button>
+                    </div>
+                  ))}
+
                 {section.id === "testsamples" && samples.length > 0 && (
                   <div className="ml-10 mt-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {samples.map((sample: Sample, index: number) => (

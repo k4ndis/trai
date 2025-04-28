@@ -11,6 +11,7 @@ import {
   FlaskConical,
   Workflow,
   Settings,
+  Plus,
 } from "lucide-react"
 
 const sections = [
@@ -55,9 +56,10 @@ export function Sidebar() {
   const router = useRouter()
   const samples = useInformationStore((state) => state.samples)
   const testSequences = useInformationStore((state) => state.testSequences)
+  const addSample = useInformationStore((state) => state.addSample)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
-  const [activeSection, setActiveSection] = useState<string>("information")
   const [activeField, setActiveField] = useState<string | null>(null)
+  const [activeSection, setActiveSection] = useState<string>("information")
 
   useEffect(() => {
     const handle = () => {
@@ -70,7 +72,7 @@ export function Sidebar() {
     return () => window.removeEventListener("focusin", handle)
   }, [])
 
-  const handleSectionClick = (sectionId: string) => {
+  const handleNavigation = (sectionId: string) => {
     setActiveSection(sectionId)
     if (pathname !== `/${sectionId}`) {
       router.push(`/${sectionId}`)
@@ -98,7 +100,7 @@ export function Sidebar() {
   return (
     <>
       {/* Haupt-Sidebar */}
-      <aside className="fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted/40 w-16 md:flex">
+      <aside className="group fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted/40 transition-all duration-300 hover:w-64 w-16 overflow-hidden hidden md:flex">
         <nav className="flex flex-col gap-2 p-4">
           {sections.map((section) => {
             const Icon = section.icon
@@ -106,14 +108,16 @@ export function Sidebar() {
             return (
               <button
                 key={section.id}
-                onClick={() => handleSectionClick(section.id)}
+                onClick={() => handleNavigation(section.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors",
+                  "flex items-center gap-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full",
                   isActive && "bg-accent text-accent-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">{section.label}</span>
+                <Icon className="h-5 w-5 shrink-0" />
+                <span className="truncate text-left text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  {section.label}
+                </span>
               </button>
             )
           })}
@@ -121,7 +125,7 @@ export function Sidebar() {
       </aside>
 
       {/* Sub-Sidebar */}
-      <aside className="fixed top-14 left-16 z-10 flex h-screen flex-col border-r bg-muted/20 w-48 md:flex p-4">
+      <aside className="fixed top-14 left-16 z-10 flex h-screen flex-col border-r bg-muted/20 w-48 md:flex p-4 overflow-y-auto">
         <nav className="flex flex-col gap-2">
           {currentSection?.id === "information" &&
             currentSection.items.map((item) => (
@@ -139,16 +143,26 @@ export function Sidebar() {
               </button>
             ))}
 
-          {currentSection?.id === "testsamples" &&
-            samples.map((sample, index) => (
+          {currentSection?.id === "testsamples" && (
+            <>
               <button
-                key={sample.id}
-                onClick={() => handleScrollTo(`Sample ${index + 1}`)}
-                className="text-left text-sm text-muted-foreground rounded px-2 py-1 hover:bg-accent hover:text-accent-foreground"
+                onClick={() => addSample()}
+                className="flex items-center gap-2 text-left text-sm text-muted-foreground rounded px-2 py-1 hover:bg-accent hover:text-accent-foreground"
               >
-                #{index + 1} · {sample.productNumber}
+                <Plus className="h-4 w-4" />
+                Add Sample
               </button>
-            ))}
+              {samples.map((sample, index) => (
+                <button
+                  key={sample.id}
+                  onClick={() => handleScrollTo(`Sample ${index + 1}`)}
+                  className="text-left text-sm text-muted-foreground rounded px-2 py-1 hover:bg-accent hover:text-accent-foreground"
+                >
+                  #{index + 1} · {sample.productNumber || "No Product Number"}
+                </button>
+              ))}
+            </>
+          )}
 
           {currentSection?.id === "testprocedure" &&
             testSequences.map((seq, index) => (
@@ -163,7 +177,7 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      {/* Mobile Sidebar (nur Hauptnavigation sichtbar) */}
+      {/* Mobile Sidebar */}
       {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
@@ -179,7 +193,7 @@ export function Sidebar() {
                 return (
                   <button
                     key={section.id}
-                    onClick={() => handleSectionClick(section.id)}
+                    onClick={() => handleNavigation(section.id)}
                     className="flex items-center gap-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full"
                   >
                     <Icon className="h-5 w-5 shrink-0" />

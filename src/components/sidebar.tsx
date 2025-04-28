@@ -1,23 +1,22 @@
 // src/components/sidebar.tsx
 "use client"
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useInformationStore, useUIStore } from "@/lib/store"
 import { useEffect, useState } from "react"
 import type { Sample, TestSequence } from "@/lib/store"
-import {
-  LayoutDashboard,
-  FlaskConical,
-  Workflow,
-  Settings,
-} from "lucide-react"
 
 const sections = [
   {
     id: "information",
     label: "Information",
-    icon: LayoutDashboard,
     items: [
       "Report",
       "Project",
@@ -33,20 +32,12 @@ const sections = [
   {
     id: "testsamples",
     label: "Samples",
-    icon: FlaskConical,
     items: [],
   },
   {
     id: "testprocedure",
     label: "Procedure",
-    icon: Workflow,
     items: ["Test Type", "Test Sequence"],
-  },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: Settings,
-    items: [],
   },
 ]
 
@@ -69,13 +60,6 @@ export function Sidebar() {
     window.addEventListener("focusin", handle)
     return () => window.removeEventListener("focusin", handle)
   }, [])
-
-  const handleNavigation = (sectionId: string) => {
-    if (pathname !== `/${sectionId}`) {
-      router.push(`/${sectionId}`)
-    }
-    closeMobileSidebar()
-  }
 
   const handleScrollTo = (id: string, sectionId: string) => {
     const idNormalized = id.toLowerCase().replace(/ /g, "")
@@ -100,52 +84,15 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="group fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted/40 transition-all duration-300 hover:w-64 w-16 overflow-hidden hidden md:flex">
-        <nav className="flex flex-col gap-2 p-4">
-          {sections.map((section) => {
-            const Icon = section.icon
-            return (
-              <div key={section.id} className="relative">
-                <button
-                  onClick={() => handleNavigation(section.id)}
-                  className="flex items-center gap-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full"
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span className="truncate text-left text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                    {section.label}
-                  </span>
-                </button>
-                {/* Dynamische Sub-Listen */}
-                {section.id === "testsamples" && samples.length > 0 && (
-                  <div className="ml-10 mt-1 flex flex-col gap-1">
-                    {samples.map((sample, index) => (
-                      <button
-                        key={sample.id}
-                        onClick={() => handleScrollTo(`Sample ${index + 1}`, section.id)}
-                        className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded px-1 text-left opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        #{index + 1} · {sample.productNumber}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {section.id === "testprocedure" && testSequences.length > 0 && (
-                  <div className="ml-10 mt-1 flex flex-col gap-1">
-                    {testSequences.map((seq, index) => (
-                      <button
-                        key={seq.id}
-                        onClick={() => handleScrollTo("testsequence", section.id)}
-                        className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded px-1 text-left opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        #{index + 1} {seq.type || "(unnamed)"}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </nav>
+      <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
+        <SidebarContent
+          information={information}
+          samples={samples}
+          testSequences={testSequences}
+          activeField={activeField}
+          handleScrollTo={handleScrollTo}
+          router={router}
+        />
       </aside>
 
       {isMobileSidebarOpen && (
@@ -157,24 +104,145 @@ export function Sidebar() {
             className="w-64 h-full bg-background border-r p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <nav className="flex flex-col gap-2">
-              {sections.map((section) => {
-                const Icon = section.icon
-                return (
-                  <button
-                    key={section.id}
-                    onClick={() => handleNavigation(section.id)}
-                    className="flex items-center gap-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full"
-                  >
-                    <Icon className="h-5 w-5 shrink-0" />
-                    <span className="text-sm">{section.label}</span>
-                  </button>
-                )
-              })}
-            </nav>
+            <SidebarContent
+              information={information}
+              samples={samples}
+              testSequences={testSequences}
+              activeField={activeField}
+              handleScrollTo={handleScrollTo}
+              router={router}
+            />
           </aside>
         </div>
       )}
     </>
+  )
+}
+
+type SidebarContentProps = {
+  information: Record<string, string>
+  samples: Sample[]
+  testSequences: TestSequence[]
+  activeField: string | null
+  handleScrollTo: (id: string, sectionId: string) => void
+  router: ReturnType<typeof useRouter>
+}
+
+function SidebarContent({
+  information,
+  samples,
+  testSequences,
+  activeField,
+  handleScrollTo,
+  router,
+}: SidebarContentProps) {
+  return (
+    <Accordion type="multiple" className="w-full">
+      {sections.map((section) => (
+        <AccordionItem key={section.id} value={section.id}>
+          <AccordionTrigger
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/${section.id}`)
+            }}
+            className={cn(
+              "group w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 no-underline"
+            )}
+          >
+            <span className="cursor-pointer w-full text-left">
+              {section.label}
+            </span>
+          </AccordionTrigger>
+
+          {section.id === "testsamples" ? (
+            <AccordionContent>
+              <ul className="space-y-1 pl-2 text-sm">
+                {samples.map((sample, index) => {
+                  const label = `#${index + 1} · ${sample.productNumber} · ${sample.productionDate} · ${sample.serialNumber}`
+                  return (
+                    <li key={sample.id}>
+                      <button
+                        onClick={() => handleScrollTo(`Sample ${index + 1}`, section.id)}
+                        className={cn(
+                          "text-left w-full text-xs text-muted-foreground rounded px-1 hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </AccordionContent>
+          ) : section.id === "testprocedure" ? (
+            <AccordionContent>
+              <ul className="space-y-1 pl-2 text-sm">
+                {section.items.map((item: string) => (
+                  <li key={item}>
+                    <button
+                      onClick={() => handleScrollTo(item, section.id)}
+                      className={cn(
+                        "text-left w-full text-sm rounded px-1",
+                        activeField?.toLowerCase().replace(/ /g, "") ===
+                          item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      {item}
+                    </button>
+                    {item === "Test Sequence" && testSequences.length > 0 && (
+                      <ul className="pl-2 mt-1 space-y-1">
+                        {testSequences.map((seq, index) => (
+                          <li key={seq.id}>
+                            <button
+                              onClick={() => handleScrollTo("testsequence", section.id)}
+                              className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent w-full text-left rounded px-1"
+                            >
+                              #{index + 1} {seq.type || "(unnamed)"}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {information[item.toLowerCase().replace(/ /g, "")] && (
+                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
+                        {information[item.toLowerCase().replace(/ /g, "")]}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          ) : section.items.length > 0 ? (
+            <AccordionContent>
+              <ul className="space-y-1 pl-2 text-sm">
+                {section.items.map((item: string) => (
+                  <li key={item}>
+                    <button
+                      onClick={() => handleScrollTo(item, section.id)}
+                      className={cn(
+                        "text-left w-full text-sm rounded px-1",
+                        activeField?.toLowerCase().replace(/ /g, "") ===
+                          item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      {item}
+                    </button>
+                    {information[item.toLowerCase().replace(/ /g, "")] && (
+                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
+                        {information[item.toLowerCase().replace(/ /g, "")]}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          ) : null}
+        </AccordionItem>
+      ))}
+    </Accordion>
   )
 }

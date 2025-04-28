@@ -51,6 +51,7 @@ interface InformationState {
     value: string | number | string[] | number[]
   ) => void
   setSamples: (samples: Sample[]) => void
+  addSample: () => void // ✅ NEU eingefügt
   addSampleImage: (sampleId: number, image: SampleImage) => void
   removeSampleImage: (sampleId: number, imageUrl: string) => void
   clearFields: () => void
@@ -90,6 +91,23 @@ export const useInformationStore = create<InformationState>()(
           ),
         })),
       setSamples: (samples) => set({ samples }),
+      
+      // ✅ NEU: addSample Funktion
+      addSample: () =>
+        set((state) => ({
+          samples: [
+            ...state.samples,
+            {
+              id: Date.now(),
+              productNumber: "",
+              productionDate: "",
+              serialNumber: "",
+              features: "",
+              images: [],
+            },
+          ],
+        })),
+
       addSampleImage: (sampleId, image) =>
         set((state) => ({
           samples: state.samples.map((s) =>
@@ -109,7 +127,7 @@ export const useInformationStore = create<InformationState>()(
       clearTestSequences: () => set({ testSequences: [] }),
     }),
     {
-      name: "information-store", 
+      name: "information-store",
       partialize: (state) => ({
         fields: state.fields,
         testSequences: state.testSequences,

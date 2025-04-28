@@ -72,6 +72,7 @@ export function SampleSection({
                 placeholder="Product Number"
                 value={sample.productNumber}
                 onChange={(e) => updateSample(sample.id, "productNumber", e.target.value)}
+                className="max-w-sm"
               />
             </div>
 
@@ -81,6 +82,7 @@ export function SampleSection({
                 placeholder="Production Date"
                 value={sample.productionDate}
                 onChange={(e) => updateSample(sample.id, "productionDate", e.target.value)}
+                className="max-w-sm"
               />
             </div>
 
@@ -90,6 +92,7 @@ export function SampleSection({
                 placeholder="Serial Number"
                 value={sample.serialNumber}
                 onChange={(e) => updateSample(sample.id, "serialNumber", e.target.value)}
+                className="max-w-sm"
               />
             </div>
 
@@ -99,6 +102,7 @@ export function SampleSection({
                 placeholder="Features / Deviations"
                 value={sample.features}
                 onChange={(e) => updateSample(sample.id, "features", e.target.value)}
+                className="max-w-sm"
               />
             </div>
 

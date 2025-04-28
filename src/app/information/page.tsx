@@ -9,13 +9,12 @@ import { useRouter } from "next/navigation"
 import { useInformationStore } from "@/lib/store"
 
 export default function InformationPage() {
-  // Korrekte Verwendung des Stores ohne getField, das nicht existiert
+  
   const updateField = useInformationStore((state) => state.updateField)
   const fields = useInformationStore((state) => state.fields)
   const router = useRouter()
   
-  // Initialisiere distribution aus dem fields-Objekt
-  const [distribution, setDistribution] = useState<string[]>(() => {
+    const [distribution, setDistribution] = useState<string[]>(() => {
     const savedList = fields.distributionlist || "";
     return savedList ? savedList.split(", ").filter(Boolean) : [];
   });

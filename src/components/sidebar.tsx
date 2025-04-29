@@ -49,6 +49,7 @@ export function Sidebar() {
   const testSequences = useInformationStore((state) => state.testSequences)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
   const [activeField, setActiveField] = useState<string | null>(null)
+  const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
     const handle = () => {
@@ -84,7 +85,15 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
+      <aside className={`${collapsed ? "w-20" : "w-64"} h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 transition-all duration-300 overflow-y-auto p-4 hidden md:block`}>
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {collapsed ? "»" : "«"}
+          </button>
+        </div>
         <SidebarContent
           information={information}
           samples={samples}
@@ -92,6 +101,7 @@ export function Sidebar() {
           activeField={activeField}
           handleScrollTo={handleScrollTo}
           router={router}
+          collapsed={collapsed}
         />
       </aside>
 
@@ -111,6 +121,7 @@ export function Sidebar() {
               activeField={activeField}
               handleScrollTo={handleScrollTo}
               router={router}
+              collapsed={false}
             />
           </aside>
         </div>
@@ -126,6 +137,7 @@ type SidebarContentProps = {
   activeField: string | null
   handleScrollTo: (id: string, sectionId: string) => void
   router: ReturnType<typeof useRouter>
+  collapsed: boolean
 }
 
 function SidebarContent({
@@ -135,6 +147,7 @@ function SidebarContent({
   activeField,
   handleScrollTo,
   router,
+  collapsed,
 }: SidebarContentProps) {
   return (
     <Accordion type="multiple" className="w-full">
@@ -150,7 +163,7 @@ function SidebarContent({
             )}
           >
             <span className="cursor-pointer w-full text-left">
-              {section.label}
+              {collapsed ? null : section.label}
             </span>
           </AccordionTrigger>
 
@@ -167,7 +180,7 @@ function SidebarContent({
                           "text-left w-full text-xs text-muted-foreground rounded px-1 hover:bg-accent hover:text-accent-foreground"
                         )}
                       >
-                        {label}
+                        {collapsed ? null : label}
                       </button>
                     </li>
                   )
@@ -183,13 +196,12 @@ function SidebarContent({
                       onClick={() => handleScrollTo(item, section.id)}
                       className={cn(
                         "text-left w-full text-sm rounded px-1",
-                        activeField?.toLowerCase().replace(/ /g, "") ===
-                          item.toLowerCase().replace(/ /g, "")
+                        activeField?.toLowerCase().replace(/ /g, "") === item.toLowerCase().replace(/ /g, "")
                           ? "bg-accent text-accent-foreground font-medium"
                           : "hover:bg-accent hover:text-accent-foreground"
                       )}
                     >
-                      {item}
+                      {collapsed ? null : item}
                     </button>
                     {item === "Test Sequence" && testSequences.length > 0 && (
                       <ul className="pl-2 mt-1 space-y-1">
@@ -199,13 +211,13 @@ function SidebarContent({
                               onClick={() => handleScrollTo("testsequence", section.id)}
                               className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent w-full text-left rounded px-1"
                             >
-                              #{index + 1} {seq.type || "(unnamed)"}
+                              {collapsed ? null : `#${index + 1} ${seq.type || "(unnamed)"}`}
                             </button>
                           </li>
                         ))}
                       </ul>
                     )}
-                    {information[item.toLowerCase().replace(/ /g, "")] && (
+                    {!collapsed && information[item.toLowerCase().replace(/ /g, "")] && (
                       <div className="text-muted-foreground text-xs mt-0.5 pl-1">
                         {information[item.toLowerCase().replace(/ /g, "")]}
                       </div>
@@ -223,15 +235,14 @@ function SidebarContent({
                       onClick={() => handleScrollTo(item, section.id)}
                       className={cn(
                         "text-left w-full text-sm rounded px-1",
-                        activeField?.toLowerCase().replace(/ /g, "") ===
-                          item.toLowerCase().replace(/ /g, "")
+                        activeField?.toLowerCase().replace(/ /g, "") === item.toLowerCase().replace(/ /g, "")
                           ? "bg-accent text-accent-foreground font-medium"
                           : "hover:bg-accent hover:text-accent-foreground"
                       )}
                     >
-                      {item}
+                      {collapsed ? null : item}
                     </button>
-                    {information[item.toLowerCase().replace(/ /g, "")] && (
+                    {!collapsed && information[item.toLowerCase().replace(/ /g, "")] && (
                       <div className="text-muted-foreground text-xs mt-0.5 pl-1">
                         {information[item.toLowerCase().replace(/ /g, "")]}
                       </div>

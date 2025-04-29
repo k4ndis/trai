@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { useInformationStore } from "@/lib/store"
-import { Plus, Filter, ArrowUpDown, Trash2 } from "lucide-react"
+import { Plus, ArrowUpDown, Trash2 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogFooter } from "@/components/ui/dialog"

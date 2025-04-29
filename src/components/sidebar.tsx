@@ -46,8 +46,8 @@ const sections = [
   {
     id: "settings",
     label: "Settings",
-    icon: Settings,
     items: [],
+    icon: Settings,
   },
 ]
 
@@ -100,7 +100,7 @@ export function Sidebar() {
   return (
     <>
       {/* Haupt-Sidebar */}
-      <aside className="group fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted/40 transition-all duration-300 hover:w-64 w-16 overflow-hidden hidden md:flex">
+      <aside className="group fixed top-14 left-0 z-10 flex h-screen flex-col border-r bg-muted transition-all duration-300 hover:w-64 w-16 overflow-hidden hidden md:flex">
         <nav className="flex flex-col gap-2 p-4">
           {sections.map((section) => {
             const Icon = section.icon
@@ -125,7 +125,7 @@ export function Sidebar() {
       </aside>
 
       {/* Sub-Sidebar */}
-      <aside className="fixed top-14 left-16 z-10 flex h-screen flex-col border-r bg-muted/20 w-48 md:flex p-4 overflow-y-auto">
+      <aside className="fixed top-14 left-16 z-10 flex h-screen flex-col border-r bg-background w-48 md:flex p-4 overflow-y-auto">
         <nav className="flex flex-col gap-2">
           {currentSection?.id === "information" &&
             currentSection.items.map((item) => (

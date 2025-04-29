@@ -74,13 +74,7 @@ export default function TestSamplesPage() {
 
   return (
     <div className="space-y-10">
-      <SampleSection
-        samples={samples}
-        updateSample={updateSample}
-        updateSampleImages={updateSampleImages}
-        addSample={addSample}
-        removeItem={removeItem}
-      />
+      <SampleSection />
     </div>
   )
 }

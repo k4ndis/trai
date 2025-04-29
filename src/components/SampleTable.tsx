@@ -22,6 +22,12 @@ export function SampleTable() {
     serialNumber: "",
     features: "",
   })
+  const [editingSampleId, setEditingSampleId] = useState<number | null>(null)
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [editingValue, setEditingValue] = useState("")
+  const [sortField, setSortField] = useState<keyof Sample | null>(null)
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [searchQuery, setSearchQuery] = useState("")
 
   const toggleSelectSample = (id: number) => {
     setSelectedSamples((prev) =>
@@ -40,12 +46,7 @@ export function SampleTable() {
       images: [],
     }
     setSamples([...samples, newSampleEntry])
-    setNewSample({
-      productNumber: "",
-      productionDate: "",
-      serialNumber: "",
-      features: "",
-    })
+    setNewSample({ productNumber: "", productionDate: "", serialNumber: "", features: "" })
     setOpenAdd(false)
   }
 
@@ -55,17 +56,64 @@ export function SampleTable() {
     setOpenDeleteConfirm(false)
   }
 
+  const startEditing = (id: number, field: keyof Sample, value: string) => {
+    setEditingSampleId(id)
+    setEditingField(field)
+    setEditingValue(value)
+  }
+
+  const saveEdit = () => {
+    if (editingSampleId !== null && editingField !== null) {
+      const updatedSamples = samples.map((sample) =>
+        sample.id === editingSampleId
+          ? { ...sample, [editingField]: editingValue }
+          : sample
+      )
+      setSamples(updatedSamples)
+    }
+    setEditingSampleId(null)
+    setEditingField(null)
+    setEditingValue("")
+  }
+
+  const handleSort = (field: keyof Sample) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+  }
+
+  const sortedSamples = [...samples]
+    .filter((sample) =>
+      Object.values(sample)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (!sortField) return 0
+      const aValue = (a[sortField] || "").toString()
+      const bValue = (b[sortField] || "").toString()
+      return sortDirection === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue)
+    })
+
   return (
     <div className="space-y-4">
       {/* Topbar */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-2xl font-bold">Samples</h2>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
-          <Button variant="outline" size="sm">
+          <Input
+            placeholder="Search samples..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-xs"
+          />
+          <Button variant="outline" size="sm" onClick={() => alert("Sort options coming soon!")}>
             <ArrowUpDown className="mr-2 h-4 w-4" />
             Sort
           </Button>
@@ -111,40 +159,28 @@ export function SampleTable() {
                   placeholder="Product Number"
                   value={newSample.productNumber}
                   onChange={(e) =>
-                    setNewSample((prev) => ({
-                      ...prev,
-                      productNumber: e.target.value,
-                    }))
+                    setNewSample((prev) => ({ ...prev, productNumber: e.target.value }))
                   }
                 />
                 <Input
                   placeholder="Production Date"
                   value={newSample.productionDate}
                   onChange={(e) =>
-                    setNewSample((prev) => ({
-                      ...prev,
-                      productionDate: e.target.value,
-                    }))
+                    setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))
                   }
                 />
                 <Input
                   placeholder="Serial Number"
                   value={newSample.serialNumber}
                   onChange={(e) =>
-                    setNewSample((prev) => ({
-                      ...prev,
-                      serialNumber: e.target.value,
-                    }))
+                    setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))
                   }
                 />
                 <Input
                   placeholder="Features"
                   value={newSample.features}
                   onChange={(e) =>
-                    setNewSample((prev) => ({
-                      ...prev,
-                      features: e.target.value,
-                    }))
+                    setNewSample((prev) => ({ ...prev, features: e.target.value }))
                   }
                 />
                 <Button onClick={handleAddSample}>Save Sample</Button>
@@ -171,28 +207,46 @@ export function SampleTable() {
                   }}
                 />
               </th>
-              <th className="px-4 py-2 text-left">Product Number</th>
-              <th className="px-4 py-2 text-left">Production Date</th>
-              <th className="px-4 py-2 text-left">Serial Number</th>
-              <th className="px-4 py-2 text-left">Features</th>
+              {["Product Number", "Production Date", "Serial Number", "Features"].map((label, idx) => (
+                <th
+                  key={idx}
+                  className="px-4 py-2 text-left cursor-pointer"
+                  onClick={() => handleSort(label.toLowerCase().replace(/ /g, "") as keyof Sample)}
+                >
+                  {label}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {samples.map((sample) => (
-              <tr
-                key={sample.id}
-                className="border-t hover:bg-muted/50"
-              >
+            {sortedSamples.map((sample) => (
+              <tr key={sample.id} className="border-t hover:bg-muted/50">
                 <td className="px-4 py-2">
                   <Checkbox
                     checked={selectedSamples.includes(sample.id)}
                     onCheckedChange={() => toggleSelectSample(sample.id)}
                   />
                 </td>
-                <td className="px-4 py-2">{sample.productNumber}</td>
-                <td className="px-4 py-2">{sample.productionDate}</td>
-                <td className="px-4 py-2">{sample.serialNumber}</td>
-                <td className="px-4 py-2">{sample.features}</td>
+                {(["productNumber", "productionDate", "serialNumber", "features"] as const).map((field) => (
+                    <td
+                        key={field}
+                        className="px-4 py-2"
+                        onClick={() => startEditing(sample.id, field, sample[field]?.toString() ?? "")}
+                    >
+                        {editingSampleId === sample.id && editingField === field ? (
+                        <Input
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            onBlur={saveEdit}
+                            onKeyDown={(e) => e.key === "Enter" && saveEdit()}
+                            autoFocus
+                            className="text-xs"
+                        />
+                        ) : (
+                        sample[field]
+                        )}
+                    </td>
+                    ))}
               </tr>
             ))}
           </tbody>

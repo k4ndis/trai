@@ -82,9 +82,7 @@ export function SampleTable() {
       )
       setSamples(updatedSamples)
     }
-    setEditingSampleId(null)
-    setEditingField(null)
-    setEditingValue("")
+    cancelEdit()
   }
 
   const cancelEdit = () => {
@@ -121,17 +119,15 @@ export function SampleTable() {
   return (
     <div className="space-y-4">
       {/* Topbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap justify-between items-center gap-2">
         <h2 className="text-2xl font-bold">Samples</h2>
-        <div className="flex flex-wrap gap-2 justify-end">
+        <div className="flex flex-wrap gap-2 items-center justify-end">
           <Input
             placeholder="Search samples..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="max-w-xs"
           />
-
-          {/* Delete */}
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
               <Button
@@ -144,22 +140,15 @@ export function SampleTable() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader className="text-lg font-bold">
-                Confirm Deletion
-              </DialogHeader>
+              <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
               <p>Are you sure you want to delete the selected samples?</p>
               <DialogFooter className="mt-4">
-                <Button variant="outline" onClick={() => setOpenDeleteConfirm(false)}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={handleDeleteSelected}>
-                  Delete
-                </Button>
+                <Button variant="outline" onClick={() => setOpenDeleteConfirm(false)}>Cancel</Button>
+                <Button variant="destructive" onClick={handleDeleteSelected}>Delete</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
-          {/* Add */}
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
               <Button size="sm">
@@ -186,16 +175,24 @@ export function SampleTable() {
         <table className="min-w-full text-sm">
           <thead className="bg-muted">
             <tr>
-              <th className="px-2 py-2 w-8">#</th>
-              <th className="px-2 py-2">
+              <th className="px-2 py-2 w-8">
                 <Checkbox
                   checked={selectedSamples.length === samples.length && samples.length > 0}
                   onCheckedChange={(checked) => {
-                    setSelectedSamples(
-                      checked ? samples.map((s) => s.id) : []
-                    )
+                    setSelectedSamples(checked ? samples.map((s) => s.id) : [])
                   }}
                 />
+              </th>
+              <th className="px-2 py-2 w-8 cursor-pointer" onClick={() => handleSort("id")}>
+                <span className="flex items-center gap-1">
+                  ID
+                  {sortField === "id" &&
+                    (sortDirection === "asc" ? (
+                      <ArrowUp className="w-3 h-3" />
+                    ) : (
+                      <ArrowDown className="w-3 h-3" />
+                    ))}
+                </span>
               </th>
               {(["productNumber", "productionDate", "serialNumber", "features"] as const).map((field) => (
                 <th
@@ -204,9 +201,7 @@ export function SampleTable() {
                   className="px-4 py-2 text-left cursor-pointer select-none"
                 >
                   <span className="flex items-center gap-1">
-                    {field
-                      .replace(/([A-Z])/g, " $1")
-                      .replace(/^./, (s) => s.toUpperCase())}
+                    {field.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
                     {sortField === field &&
                       (sortDirection === "asc" ? (
                         <ArrowUp className="w-3 h-3" />
@@ -221,13 +216,13 @@ export function SampleTable() {
           <tbody>
             {sortedSamples.map((sample, index) => (
               <tr key={sample.id} className="border-t hover:bg-muted/50">
-                <td className="px-2 text-muted-foreground">{index + 1}</td>
                 <td className="px-2">
                   <Checkbox
                     checked={selectedSamples.includes(sample.id)}
                     onCheckedChange={() => toggleSelectSample(sample.id)}
                   />
                 </td>
+                <td className="px-2 text-muted-foreground">{sample.id}</td>
                 {(["productNumber", "productionDate", "serialNumber", "features"] as const).map((field) => (
                   <td
                     key={field}
@@ -235,12 +230,13 @@ export function SampleTable() {
                     onClick={() => startEditing(sample.id, field, sample[field]?.toString() ?? "")}
                   >
                     {editingSampleId === sample.id && editingField === field ? (
-                      <div>
+                      <div className="space-y-1">
                         <Input
                           value={editingValue}
                           onChange={(e) => setEditingValue(e.target.value)}
                           autoFocus
                           className="text-xs"
+                          onKeyDown={(e) => e.key === "Enter" && saveEdit()}
                         />
                         <div className="flex gap-2 mt-1">
                           <Button size="sm" onClick={saveEdit}>Save changes</Button>

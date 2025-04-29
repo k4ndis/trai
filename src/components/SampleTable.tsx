@@ -3,10 +3,10 @@
 
 import { useState } from "react"
 import { useInformationStore } from "@/lib/store"
-import { Plus, Filter, ArrowUpDown } from "lucide-react"
+import { Plus, Filter, ArrowUpDown, Trash2 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import type { Sample } from "@/lib/store"
 
@@ -14,7 +14,8 @@ export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
   const [selectedSamples, setSelectedSamples] = useState<number[]>([])
-  const [open, setOpen] = useState(false)
+  const [openAdd, setOpenAdd] = useState(false)
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false)
   const [newSample, setNewSample] = useState({
     productNumber: "",
     productionDate: "",
@@ -45,7 +46,13 @@ export function SampleTable() {
       serialNumber: "",
       features: "",
     })
-    setOpen(false)
+    setOpenAdd(false)
+  }
+
+  const handleDeleteSelected = () => {
+    setSamples(samples.filter((sample) => !selectedSamples.includes(sample.id)))
+    setSelectedSamples([])
+    setOpenDeleteConfirm(false)
   }
 
   return (
@@ -62,7 +69,35 @@ export function SampleTable() {
             <ArrowUpDown className="mr-2 h-4 w-4" />
             Sort
           </Button>
-          <Dialog open={open} onOpenChange={setOpen}>
+
+          {/* Delete Selected */}
+          <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
+            <DialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selectedSamples.length === 0}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Selected
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
+              <p>Are you sure you want to delete the selected samples?</p>
+              <DialogFooter className="mt-4">
+                <Button variant="outline" onClick={() => setOpenDeleteConfirm(false)}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteSelected}>
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Add Sample */}
+          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="mr-2 h-4 w-4" />
@@ -126,12 +161,12 @@ export function SampleTable() {
             <tr>
               <th className="px-4 py-2">
                 <Checkbox
-                  checked={selectedSamples.length === samples.length}
-                  onCheckedChange={() => {
-                    if (selectedSamples.length === samples.length) {
-                      setSelectedSamples([])
-                    } else {
+                  checked={selectedSamples.length === samples.length && samples.length > 0}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
                       setSelectedSamples(samples.map((sample) => sample.id))
+                    } else {
+                      setSelectedSamples([])
                     }
                   }}
                 />

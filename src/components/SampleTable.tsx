@@ -119,15 +119,18 @@ export function SampleTable() {
   return (
     <div className="space-y-4">
       {/* Topbar */}
-      <div className="flex flex-wrap justify-between items-center gap-2">
-        <h2 className="text-2xl font-bold">Samples</h2>
-        <div className="flex flex-wrap gap-2 items-center justify-end">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+        <h2 className="text-2xl font-bold w-full md:w-auto">Samples</h2>
+
+        <div className="flex w-full md:w-auto gap-2 items-center">
           <Input
+            type="text"
             placeholder="Search samples..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-xs"
+            className="w-full md:w-72"
           />
+
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
               <Button
@@ -151,7 +154,7 @@ export function SampleTable() {
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
-              <Button size="sm">
+              <Button size="sm" className="whitespace-nowrap">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Sample
               </Button>

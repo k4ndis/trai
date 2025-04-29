@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils"
 import { useInformationStore, useUIStore } from "@/lib/store"
 import { useEffect, useState } from "react"
 import type { Sample, TestSequence } from "@/lib/store"
+import { House, Boxes, Combine } from "lucide-react"
+import { ReactNode } from "react"
 
 const sections = [
   {
@@ -41,6 +43,13 @@ const sections = [
   },
 ]
 
+// Neue Icon Map für Hauptpunkte
+const sectionIconMap: Record<string, ReactNode> = {
+  Information: <House size={20} />,
+  Samples: <Boxes size={20} />,
+  Procedure: <Combine size={20} />,
+}
+
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
@@ -49,7 +58,7 @@ export function Sidebar() {
   const testSequences = useInformationStore((state) => state.testSequences)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
   const [activeField, setActiveField] = useState<string | null>(null)
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
 
   useEffect(() => {
     const handle = () => {
@@ -85,15 +94,11 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className={`${collapsed ? "w-20" : "w-64"} h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 transition-all duration-300 overflow-y-auto p-4 hidden md:block`}>
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {collapsed ? "»" : "«"}
-          </button>
-        </div>
+      <aside
+        onMouseEnter={() => setCollapsed(false)}
+        onMouseLeave={() => setCollapsed(true)}
+        className={`${collapsed ? "w-20" : "w-64"} h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 transition-all duration-300 overflow-y-auto p-4 hidden md:block`}
+      >
         <SidebarContent
           information={information}
           samples={samples}
@@ -149,6 +154,8 @@ function SidebarContent({
   router,
   collapsed,
 }: SidebarContentProps) {
+  const pathname = usePathname()
+
   return (
     <Accordion type="multiple" className="w-full">
       {sections.map((section) => (
@@ -159,11 +166,15 @@ function SidebarContent({
               router.push(`/${section.id}`)
             }}
             className={cn(
-              "group w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 no-underline"
+              "group w-full flex items-center gap-2 text-base font-semibold rounded px-2 py-2 no-underline transition-all",
+              pathname.includes(section.id)
+                ? "border-l-2 border-primary bg-accent text-accent-foreground"
+                : "hover:bg-accent hover:text-accent-foreground"
             )}
           >
-            <span className="cursor-pointer w-full text-left">
-              {collapsed ? null : section.label}
+            <span className="flex items-center gap-2">
+              {sectionIconMap[section.label]}
+              {!collapsed && section.label}
             </span>
           </AccordionTrigger>
 

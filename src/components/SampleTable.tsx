@@ -214,7 +214,7 @@ export function SampleTable() {
             </tr>
           </thead>
           <tbody>
-            {sortedSamples.map((sample, index) => (
+            {sortedSamples.map((sample) => (
               <tr key={sample.id} className="border-t hover:bg-muted/50">
                 <td className="px-2">
                   <Checkbox

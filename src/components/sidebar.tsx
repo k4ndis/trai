@@ -49,6 +49,7 @@ export function Sidebar() {
   const testSequences = useInformationStore((state) => state.testSequences)
   const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
   const [activeField, setActiveField] = useState<string | null>(null)
+  const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
     const handle = () => {
@@ -84,7 +85,15 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="w-64 h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 overflow-y-auto p-4 hidden md:block">
+      <aside className={`h-screen fixed top-14 left-0 z-10 border-r bg-background transition-all duration-300 overflow-y-auto p-4 hidden md:block ${collapsed ? 'w-20' : 'w-64'}`}>
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {collapsed ? "»" : "«"}
+          </button>
+        </div>
         <SidebarContent
           information={information}
           samples={samples}
@@ -92,6 +101,7 @@ export function Sidebar() {
           activeField={activeField}
           handleScrollTo={handleScrollTo}
           router={router}
+          collapsed={collapsed}
         />
       </aside>
 
@@ -100,10 +110,7 @@ export function Sidebar() {
           className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
           onClick={closeMobileSidebar}
         >
-          <aside
-            className="w-64 h-full bg-background border-r p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <aside className="w-64 h-full bg-background border-r transition-all duration-300 p-4" onClick={(e) => e.stopPropagation()}>
             <SidebarContent
               information={information}
               samples={samples}
@@ -111,6 +118,7 @@ export function Sidebar() {
               activeField={activeField}
               handleScrollTo={handleScrollTo}
               router={router}
+              collapsed={false}
             />
           </aside>
         </div>
@@ -126,6 +134,7 @@ type SidebarContentProps = {
   activeField: string | null
   handleScrollTo: (id: string, sectionId: string) => void
   router: ReturnType<typeof useRouter>
+  collapsed: boolean
 }
 
 function SidebarContent({
@@ -135,6 +144,7 @@ function SidebarContent({
   activeField,
   handleScrollTo,
   router,
+  collapsed,
 }: SidebarContentProps) {
   return (
     <Accordion type="multiple" className="w-full">
@@ -146,11 +156,11 @@ function SidebarContent({
               router.push(`/${section.id}`)
             }}
             className={cn(
-              "group w-full flex justify-between items-center text-base font-semibold hover:bg-accent hover:text-accent-foreground rounded px-2 py-2 no-underline"
+              "group w-full flex justify-between items-center text-sm font-medium rounded-md px-3 py-2 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
             )}
           >
             <span className="cursor-pointer w-full text-left">
-              {section.label}
+              {collapsed ? null : section.label}
             </span>
           </AccordionTrigger>
 
@@ -164,10 +174,10 @@ function SidebarContent({
                       <button
                         onClick={() => handleScrollTo(`Sample ${index + 1}`, section.id)}
                         className={cn(
-                          "text-left w-full text-xs text-muted-foreground rounded px-1 hover:bg-accent hover:text-accent-foreground"
+                          "text-left w-full text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200 rounded-md px-2 py-1"
                         )}
                       >
-                        {label}
+                        {collapsed ? null : label}
                       </button>
                     </li>
                   )
@@ -182,34 +192,14 @@ function SidebarContent({
                     <button
                       onClick={() => handleScrollTo(item, section.id)}
                       className={cn(
-                        "text-left w-full text-sm rounded px-1",
-                        activeField?.toLowerCase().replace(/ /g, "") ===
-                          item.toLowerCase().replace(/ /g, "")
-                          ? "bg-accent text-accent-foreground font-medium"
-                          : "hover:bg-accent hover:text-accent-foreground"
+                        "text-left w-full text-sm rounded-md px-2 py-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200",
+                        activeField?.toLowerCase().replace(/ /g, "") === item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-foreground font-medium"
+                          : ""
                       )}
                     >
-                      {item}
+                      {collapsed ? null : item}
                     </button>
-                    {item === "Test Sequence" && testSequences.length > 0 && (
-                      <ul className="pl-2 mt-1 space-y-1">
-                        {testSequences.map((seq, index) => (
-                          <li key={seq.id}>
-                            <button
-                              onClick={() => handleScrollTo("testsequence", section.id)}
-                              className="text-xs text-muted-foreground hover:text-accent-foreground hover:bg-accent w-full text-left rounded px-1"
-                            >
-                              #{index + 1} {seq.type || "(unnamed)"}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {information[item.toLowerCase().replace(/ /g, "")] && (
-                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
-                        {information[item.toLowerCase().replace(/ /g, "")]}
-                      </div>
-                    )}
                   </li>
                 ))}
               </ul>
@@ -222,20 +212,14 @@ function SidebarContent({
                     <button
                       onClick={() => handleScrollTo(item, section.id)}
                       className={cn(
-                        "text-left w-full text-sm rounded px-1",
-                        activeField?.toLowerCase().replace(/ /g, "") ===
-                          item.toLowerCase().replace(/ /g, "")
-                          ? "bg-accent text-accent-foreground font-medium"
-                          : "hover:bg-accent hover:text-accent-foreground"
+                        "text-left w-full text-sm rounded-md px-2 py-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200",
+                        activeField?.toLowerCase().replace(/ /g, "") === item.toLowerCase().replace(/ /g, "")
+                          ? "bg-accent text-foreground font-medium"
+                          : ""
                       )}
                     >
-                      {item}
+                      {collapsed ? null : item}
                     </button>
-                    {information[item.toLowerCase().replace(/ /g, "")] && (
-                      <div className="text-muted-foreground text-xs mt-0.5 pl-1">
-                        {information[item.toLowerCase().replace(/ /g, "")]}
-                      </div>
-                    )}
                   </li>
                 ))}
               </ul>

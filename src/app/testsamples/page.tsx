@@ -1,7 +1,6 @@
 // src/app/testsamples/page.tsx
 "use client"
 
-import type { Sample } from "@/app/testprocedure/SampleSection"
 import { SampleSection } from "@/app/testprocedure/SampleSection"
 import { useInformationStore } from "@/lib/store"
 import { useEffect } from "react"
@@ -10,7 +9,6 @@ import { supabase } from "@/lib/supabaseClient"
 export default function TestSamplesPage() {
   const fields = useInformationStore((state) => state.fields)
   const updateMultipleFields = useInformationStore((state) => state.updateMultipleFields)
-  const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
 
   useEffect(() => {
@@ -37,40 +35,6 @@ export default function TestSamplesPage() {
 
     loadData()
   }, [fields.report, setSamples, updateMultipleFields])
-
-  const addSample = () => {
-    setSamples([
-      ...samples,
-      {
-        id: Date.now(),
-        productNumber: "",
-        productionDate: "",
-        serialNumber: "",
-        features: "",
-        images: [],
-      },
-    ])
-  }
-
-  const updateSample = (id: number, field: keyof Sample, value: string) => {
-    const updated = samples.map((s) =>
-      s.id === id ? { ...s, [field]: value } : s
-    )
-    setSamples(updated)
-  }
-
-  const updateSampleImages = (id: number, newImages: { url: string; label: string }[]) => {
-    const updated = samples.map((s) =>
-      s.id === id ? { ...s, images: newImages } : s
-    )
-    setSamples(updated)
-  }
-
-  const removeItem = (id: number, isSample = false) => {
-    if (isSample) {
-      setSamples(samples.filter((s) => s.id !== id))
-    }
-  }
 
   return (
     <div className="space-y-10">

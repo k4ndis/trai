@@ -214,7 +214,7 @@ export function SampleTable() {
             </tr>
           </thead>
           <tbody>
-            {sortedSamples.map((sample) => (
+            {sortedSamples.map((sample, index) => (
               <tr key={sample.id} className="border-t hover:bg-muted/50">
                 <td className="px-2">
                   <Checkbox
@@ -222,7 +222,7 @@ export function SampleTable() {
                     onCheckedChange={() => toggleSelectSample(sample.id)}
                   />
                 </td>
-                <td className="px-2 text-muted-foreground">{sample.id}</td>
+                <td className="px-2 text-muted-foreground">{index + 1}</td>
                 {(["productNumber", "productionDate", "serialNumber", "features"] as const).map((field) => (
                   <td
                     key={field}

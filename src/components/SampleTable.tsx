@@ -153,12 +153,12 @@ export function SampleTable() {
           </Dialog>
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="whitespace-nowrap">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Sample
-              </Button>
-            </DialogTrigger>
+          <DialogTrigger asChild>
+            <Button variant="github" size="sm" className="whitespace-nowrap">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Sample
+            </Button>
+          </DialogTrigger>
             <DialogContent>
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Add New Sample</h3>
@@ -188,7 +188,7 @@ export function SampleTable() {
               </th>
               <th className="px-2 py-2 w-8 cursor-pointer" onClick={() => handleSort("id")}>
                 <span className="flex items-center gap-1">
-                  NO
+                  No
                   {sortField === "id" &&
                     (sortDirection === "asc" ? (
                       <ArrowUp className="w-3 h-3" />

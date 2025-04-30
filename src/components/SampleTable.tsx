@@ -157,7 +157,7 @@ export function SampleTable() {
           <Button
             variant="github"
             size="sm"
-            className="bg-primary text-white hover:bg-primary-dark"
+            
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Sample

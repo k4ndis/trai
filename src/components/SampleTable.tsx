@@ -134,7 +134,7 @@ export function SampleTable() {
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
               <Button
-                variant="destructive"
+                variant="github"
                 size="sm"
                 disabled={selectedSamples.length === 0}
               >

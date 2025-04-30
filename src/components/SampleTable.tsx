@@ -134,7 +134,7 @@ export function SampleTable() {
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
               <Button
-                variant="github"
+                variant="trai"
                 size="sm"
                 disabled={selectedSamples.length === 0}
               >
@@ -155,9 +155,9 @@ export function SampleTable() {
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
           <DialogTrigger asChild>
           <Button
-            variant="github"
+            variant="traiPrimary"
             size="sm"
-            
+            className="bg-primary text-white hover:bg-primary-dark"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Sample
@@ -170,7 +170,7 @@ export function SampleTable() {
                 <Input placeholder="Production Date" value={newSample.productionDate} onChange={(e) => setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))} />
                 <Input placeholder="Serial Number" value={newSample.serialNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))} />
                 <Input placeholder="Features" value={newSample.features} onChange={(e) => setNewSample((prev) => ({ ...prev, features: e.target.value }))} />
-                <Button variant="github" className="bg-primary text-white hover:bg-primary/90" onClick={handleAddSample}>
+                <Button variant="trai" className="bg-primary text-white hover:bg-primary/90" onClick={handleAddSample}>
                   Save Sample
                 </Button>
               </div>

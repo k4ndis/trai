@@ -119,65 +119,62 @@ export function SampleTable() {
   return (
     <div className="space-y-4">
       {/* Topbar */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-2xl font-bold w-full md:w-auto">Samples</h2>
+<div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+  <h2 className="text-2xl font-bold w-full md:w-auto">Samples</h2>
 
-        <div className="flex w-full md:w-auto gap-2 items-center">
-          <Input
-            type="text"
-            placeholder="Search samples..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full md:w-72"
-          />
+  <div className="flex w-full md:w-auto gap-2 items-center">
+    <Input
+      type="text"
+      placeholder="Search samples..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="w-full md:w-72"
+    />
 
-          <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
-            <DialogTrigger asChild>
-              <Button
-                variant="trai"
-                size="sm"
-                disabled={selectedSamples.length === 0}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Selected
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
-              <p>Are you sure you want to delete the selected samples?</p>
-              <DialogFooter className="mt-4">
-                <Button variant="outline" onClick={() => setOpenDeleteConfirm(false)}>Cancel</Button>
-                <Button variant="destructive" onClick={handleDeleteSelected}>Delete</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+    <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
+      <DialogTrigger asChild>
+        <Button
+          variant="trai"
+          size="sm"
+          disabled={selectedSamples.length === 0}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete Selected
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
+        <p>Are you sure you want to delete the selected samples?</p>
+        <DialogFooter className="mt-4">
+          <Button variant="outline" onClick={() => setOpenDeleteConfirm(false)}>Cancel</Button>
+          <Button variant="destructive" onClick={handleDeleteSelected}>Delete</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
-          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-          <DialogTrigger asChild>
-          <Button
-            variant="traiPrimary"
-            size="sm"
-            className="bg-primary text-white hover:bg-primary-dark"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Sample
+    <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+      <DialogTrigger asChild>
+        <Button variant="traiPrimary" size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Sample
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Add New Sample</h3>
+          <Input placeholder="Product Number" value={newSample.productNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, productNumber: e.target.value }))} />
+          <Input placeholder="Production Date" value={newSample.productionDate} onChange={(e) => setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))} />
+          <Input placeholder="Serial Number" value={newSample.serialNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))} />
+          <Input placeholder="Features" value={newSample.features} onChange={(e) => setNewSample((prev) => ({ ...prev, features: e.target.value }))} />
+          <Button variant="traiPrimary" onClick={handleAddSample}>
+            Save Sample
           </Button>
-          </DialogTrigger>
-            <DialogContent>
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Add New Sample</h3>
-                <Input placeholder="Product Number" value={newSample.productNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, productNumber: e.target.value }))} />
-                <Input placeholder="Production Date" value={newSample.productionDate} onChange={(e) => setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))} />
-                <Input placeholder="Serial Number" value={newSample.serialNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))} />
-                <Input placeholder="Features" value={newSample.features} onChange={(e) => setNewSample((prev) => ({ ...prev, features: e.target.value }))} />
-                <Button variant="trai" className="bg-primary text-white hover:bg-primary/90" onClick={handleAddSample}>
-                  Save Sample
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
-      </div>
+      </DialogContent>
+    </Dialog>
+  </div>
+</div>
+
 
       {/* Table */}
       <div className="border rounded-md overflow-x-auto">

@@ -154,7 +154,11 @@ export function SampleTable() {
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
           <DialogTrigger asChild>
-            <Button variant="github" size="sm" className="whitespace-nowrap">
+            <Button
+              variant="github"
+              size="sm"
+              className="whitespace-nowrap bg-primary text-white hover:bg-primary/90"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add Sample
             </Button>

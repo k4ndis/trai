@@ -136,6 +136,7 @@ export function SampleTable() {
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
             <TraiButton
+              color="error"              
               startIcon={<Trash2 />}
               disabled={selectedSamples.length === 0}
               onClick={() => setOpenDeleteConfirm(true)}

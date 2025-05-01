@@ -19,7 +19,11 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",        
+        link: "text-primary underline-offset-4 hover:underline",
+
+        // Neue TRAI-Buttons:
+        trai: "border bg-muted hover:bg-accent text-foreground shadow-sm px-4 py-1.5 rounded-sm",
+        traiPrimary: "bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-1.5 rounded-sm",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import type { Sample } from "@/lib/store"
+import Button from '@mui/material/Button'
+import AddIcon from '@mui/icons-material/Add'
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
@@ -154,10 +156,9 @@ export function SampleTable() {
 
     <Dialog open={openAdd} onOpenChange={setOpenAdd}>
       <DialogTrigger asChild>
-        <Button variant="traiPrimary" size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Sample
-        </Button>
+      <Button variant="contained" size="small" startIcon={<AddIcon />}>
+        Add Sample
+      </Button>
       </DialogTrigger>
       <DialogContent>
         <div className="space-y-4">

@@ -156,7 +156,12 @@ export function SampleTable() {
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
-            <MuiButton variant="contained" size="small" startIcon={<AddIcon />}>
+            <MuiButton
+              variant="contained"
+              size="small"
+              color="primary"
+              startIcon={<AddIcon />}
+            >
               Add Sample
             </MuiButton>
             </DialogTrigger>

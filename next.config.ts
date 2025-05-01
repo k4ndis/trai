@@ -1,4 +1,4 @@
-const isDev = process.env.NODE_ENV === "development";
+const isVercelPreview = process.env.VERCEL_ENV === "preview"
 
 const nextConfig = {
   experimental: {
@@ -12,14 +12,14 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: isDev
+            value: isVercelPreview
               ? "script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none';"
               : "script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none';"
           }
         ]
       }
-    ];
+    ]
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

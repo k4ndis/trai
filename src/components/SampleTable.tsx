@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useInformationStore } from "@/lib/store"
 import { Trash2, ArrowDown, ArrowUp } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Button } from "@/components/ui/button"
+
 import {
   Dialog,
   DialogContent,

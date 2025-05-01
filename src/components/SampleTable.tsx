@@ -135,21 +135,25 @@ export function SampleTable() {
 
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
-              <Button
-                variant="trai"
-                size="sm"
-                disabled={selectedSamples.length === 0}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Selected
-              </Button>
+            <TraiButton
+              startIcon={<Trash2 />}
+              disabled={selectedSamples.length === 0}
+              onClick={() => setOpenDeleteConfirm(true)}
+            >
+              Delete Selected
+            </TraiButton>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
               <p>Are you sure you want to delete the selected samples?</p>
               <DialogFooter className="mt-4">
-                <Button variant="outline" onClick={() => setOpenDeleteConfirm(false)}>Cancel</Button>
-                <Button variant="destructive" onClick={handleDeleteSelected}>Delete</Button>
+              <TraiButton onClick={() => setOpenDeleteConfirm(false)}>
+                Cancel
+              </TraiButton>
+
+              <TraiButton color="error" onClick={handleDeleteSelected}>
+                Delete
+              </TraiButton>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -167,9 +171,9 @@ export function SampleTable() {
                 <Input placeholder="Production Date" value={newSample.productionDate} onChange={(e) => setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))} />
                 <Input placeholder="Serial Number" value={newSample.serialNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))} />
                 <Input placeholder="Features" value={newSample.features} onChange={(e) => setNewSample((prev) => ({ ...prev, features: e.target.value }))} />
-                <Button variant="traiPrimary" onClick={handleAddSample}>
+                <TraiButton onClick={handleAddSample}>
                   Save Sample
-                </Button>
+                </TraiButton>
               </div>
             </DialogContent>
           </Dialog>
@@ -246,8 +250,13 @@ export function SampleTable() {
                           onKeyDown={(e) => e.key === "Enter" && saveEdit()}
                         />
                         <div className="flex gap-2 mt-1">
-                          <Button size="sm" onClick={saveEdit}>Save changes</Button>
-                          <Button variant="outline" size="sm" onClick={cancelEdit}>Cancel</Button>
+                        <TraiButton size="small" onClick={saveEdit}>
+                          Save changes
+                        </TraiButton>
+
+                        <TraiButton size="small" sx={{ backgroundColor: "transparent", color: "inherit" }} onClick={cancelEdit}>
+                          Cancel
+                        </TraiButton>
                         </div>
                       </div>
                     ) : (

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import type { Sample } from "@/lib/store"
-import MuiButton from '@mui/material/Button'
+import TraiButton from "@/components/ui/TraiButton"
 import AddIcon from '@mui/icons-material/Add'
 
 export function SampleTable() {
@@ -156,14 +156,9 @@ export function SampleTable() {
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
-            <MuiButton
-              variant="contained"
-              size="small"
-              color="primary"
-              startIcon={<AddIcon />}
-            >
+            <TraiButton startIcon={<AddIcon />}>
               Add Sample
-            </MuiButton>
+            </TraiButton>
             </DialogTrigger>
             <DialogContent>
               <div className="space-y-4">

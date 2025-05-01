@@ -155,7 +155,7 @@ export function SampleTable() {
           </Dialog>
 
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
             <TraiButton startIcon={<AddIcon />}>
               Add Sample
             </TraiButton>

@@ -1,27 +1,20 @@
-// src/components/SampleTable.tsx
 "use client"
 
 import { useState } from "react"
 import { useInformationStore } from "@/lib/store"
-import { Trash2, ArrowDown, ArrowUp } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogHeader,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { DataGrid, GridToolbar } from "@mui/x-data-grid"
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import type { Sample } from "@/lib/store"
 import TraiButton from "@/components/ui/TraiButton"
-import AddIcon from '@mui/icons-material/Add'
+import AddIcon from "@mui/icons-material/Add"
+import DeleteIcon from "@mui/icons-material/Delete"
+import type { GridRowSelectionModel } from '@mui/x-data-grid'
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
-  const [selectedSamples, setSelectedSamples] = useState<number[]>([])
+
+  const [selectedSampleIds, setSelectedSampleIds] = useState<number[]>([])
   const [openAdd, setOpenAdd] = useState(false)
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false)
   const [newSample, setNewSample] = useState({
@@ -30,27 +23,12 @@ export function SampleTable() {
     serialNumber: "",
     features: "",
   })
-  const [editingSampleId, setEditingSampleId] = useState<number | null>(null)
-  const [editingField, setEditingField] = useState<string | null>(null)
-  const [editingValue, setEditingValue] = useState("")
-  const [sortField, setSortField] = useState<keyof Sample | null>(null)
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-  const [searchQuery, setSearchQuery] = useState("")
-
-  const toggleSelectSample = (id: number) => {
-    setSelectedSamples((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
-    )
-  }
 
   const handleAddSample = () => {
     const id = Date.now()
-    const newSampleEntry: Sample = {
+    const newSampleEntry = {
       id,
-      productNumber: newSample.productNumber,
-      productionDate: newSample.productionDate,
-      serialNumber: newSample.serialNumber,
-      features: newSample.features,
+      ...newSample,
       images: [],
     }
     setSamples([...samples, newSampleEntry])
@@ -64,59 +42,18 @@ export function SampleTable() {
   }
 
   const handleDeleteSelected = () => {
-    setSamples(samples.filter((sample) => !selectedSamples.includes(sample.id)))
-    setSelectedSamples([])
+    setSamples(samples.filter((sample) => !selectedSampleIds.includes(sample.id)))
+    setSelectedSampleIds([])
     setOpenDeleteConfirm(false)
   }
 
-  const startEditing = (id: number, field: keyof Sample, value: string) => {
-    setEditingSampleId(id)
-    setEditingField(field)
-    setEditingValue(value)
-  }
-
-  const saveEdit = () => {
-    if (editingSampleId !== null && editingField !== null) {
-      const updatedSamples = samples.map((sample) =>
-        sample.id === editingSampleId
-          ? { ...sample, [editingField]: editingValue }
-          : sample
-      )
-      setSamples(updatedSamples)
-    }
-    cancelEdit()
-  }
-
-  const cancelEdit = () => {
-    setEditingSampleId(null)
-    setEditingField(null)
-    setEditingValue("")
-  }
-
-  const handleSort = (field: keyof Sample) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-    } else {
-      setSortField(field)
-      setSortDirection("asc")
-    }
-  }
-
-  const sortedSamples = [...samples]
-    .filter((sample) =>
-      Object.values(sample)
-        .join(" ")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (!sortField) return 0
-      const aValue = (a[sortField] || "").toString()
-      const bValue = (b[sortField] || "").toString()
-      return sortDirection === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue)
-    })
+  const columns = [
+    { field: "id", headerName: "No", width: 80 },
+    { field: "productNumber", headerName: "Product Number", flex: 1 },
+    { field: "productionDate", headerName: "Production Date", flex: 1 },
+    { field: "serialNumber", headerName: "Serial Number", flex: 1 },
+    { field: "features", headerName: "Features", flex: 1 },
+  ]
 
   return (
     <div className="space-y-4">
@@ -125,45 +62,35 @@ export function SampleTable() {
         <h2 className="text-2xl font-bold w-full md:w-auto">Samples</h2>
 
         <div className="flex w-full md:w-auto gap-2 items-center">
-          <Input
-            type="text"
-            placeholder="Search samples..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full md:w-72"
-          />
-
+          {/* Delete */}
           <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
             <DialogTrigger asChild>
-            <TraiButton
-              color="error"              
-              startIcon={<Trash2 />}
-              disabled={selectedSamples.length === 0}
-              onClick={() => setOpenDeleteConfirm(true)}
-            >
-              Delete Selected
-            </TraiButton>
+              <TraiButton
+                color="error"
+                startIcon={<DeleteIcon />}
+                disabled={selectedSampleIds.length === 0}
+              >
+                Delete Selected
+              </TraiButton>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
               <p>Are you sure you want to delete the selected samples?</p>
               <DialogFooter className="mt-4">
-              <TraiButton onClick={() => setOpenDeleteConfirm(false)}>
-                Cancel
-              </TraiButton>
-
-              <TraiButton color="error" onClick={handleDeleteSelected}>
-                Delete
-              </TraiButton>
+                <TraiButton onClick={() => setOpenDeleteConfirm(false)}>
+                  Cancel
+                </TraiButton>
+                <TraiButton color="error" onClick={handleDeleteSelected}>
+                  Delete
+                </TraiButton>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
+          {/* Add */}
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger>
-            <TraiButton startIcon={<AddIcon />}>
-              Add Sample
-            </TraiButton>
+              <TraiButton startIcon={<AddIcon />}>Add Sample</TraiButton>
             </DialogTrigger>
             <DialogContent>
               <div className="space-y-4">
@@ -172,103 +99,39 @@ export function SampleTable() {
                 <Input placeholder="Production Date" value={newSample.productionDate} onChange={(e) => setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))} />
                 <Input placeholder="Serial Number" value={newSample.serialNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))} />
                 <Input placeholder="Features" value={newSample.features} onChange={(e) => setNewSample((prev) => ({ ...prev, features: e.target.value }))} />
-                <TraiButton onClick={handleAddSample}>
-                  Save Sample
-                </TraiButton>
+                <TraiButton onClick={handleAddSample}>Save Sample</TraiButton>
               </div>
             </DialogContent>
           </Dialog>
         </div>
-</div>
+      </div>
 
-
-      {/* Table */}
-      <div className="border rounded-md overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="bg-muted">
-            <tr>
-              <th className="px-2 py-2 w-8">
-                <Checkbox
-                  checked={selectedSamples.length === samples.length && samples.length > 0}
-                  onCheckedChange={(checked) => {
-                    setSelectedSamples(checked ? samples.map((s) => s.id) : [])
-                  }}
-                />
-              </th>
-              <th className="px-2 py-2 w-8 cursor-pointer" onClick={() => handleSort("id")}>
-                <span className="flex items-center gap-1">
-                  No
-                  {sortField === "id" &&
-                    (sortDirection === "asc" ? (
-                      <ArrowUp className="w-3 h-3" />
-                    ) : (
-                      <ArrowDown className="w-3 h-3" />
-                    ))}
-                </span>
-              </th>
-              {(["productNumber", "productionDate", "serialNumber", "features"] as const).map((field) => (
-                <th
-                  key={field}
-                  onClick={() => handleSort(field)}
-                  className="px-4 py-2 text-left cursor-pointer select-none"
-                >
-                  <span className="flex items-center gap-1">
-                    {field.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                    {sortField === field &&
-                      (sortDirection === "asc" ? (
-                        <ArrowUp className="w-3 h-3" />
-                      ) : (
-                        <ArrowDown className="w-3 h-3" />
-                      ))}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedSamples.map((sample, index) => (
-              <tr key={sample.id} className="border-t hover:bg-muted/50">
-                <td className="px-2">
-                  <Checkbox
-                    checked={selectedSamples.includes(sample.id)}
-                    onCheckedChange={() => toggleSelectSample(sample.id)}
-                  />
-                </td>
-                <td className="px-2 text-muted-foreground">{index + 1}</td>
-                {(["productNumber", "productionDate", "serialNumber", "features"] as const).map((field) => (
-                  <td
-                    key={field}
-                    className="px-4 py-2"
-                    onClick={() => startEditing(sample.id, field, sample[field]?.toString() ?? "")}
-                  >
-                    {editingSampleId === sample.id && editingField === field ? (
-                      <div className="space-y-1">
-                        <Input
-                          value={editingValue}
-                          onChange={(e) => setEditingValue(e.target.value)}
-                          autoFocus
-                          className="text-xs"
-                          onKeyDown={(e) => e.key === "Enter" && saveEdit()}
-                        />
-                        <div className="flex gap-2 mt-1">
-                        <TraiButton size="small" onClick={saveEdit}>
-                          Save changes
-                        </TraiButton>
-
-                        <TraiButton size="small" sx={{ backgroundColor: "transparent", color: "inherit" }} onClick={cancelEdit}>
-                          Cancel
-                        </TraiButton>
-                        </div>
-                      </div>
-                    ) : (
-                      sample[field]
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* MUI Data Grid */}
+      <div className="w-full">
+      <DataGrid
+        autoHeight
+        rows={samples}
+        columns={columns}
+        checkboxSelection
+        disableRowSelectionOnClick
+        pageSizeOptions={[5, 10, 20]}
+        onRowSelectionModelChange={(model) => {
+          if (Array.isArray(model)) {
+            setSelectedSampleIds(model.map((id) => Number(id)));
+          }
+        }}
+        rowSelectionModel={selectedSampleIds.map(String) as unknown as GridRowSelectionModel}
+        slots={{ toolbar: GridToolbar }}
+        sx={{
+          borderRadius: 2,
+          backgroundColor: "background.default",
+          color: "text.primary",
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "action.hover",
+            fontWeight: "bold",
+          },
+        }}
+      />
       </div>
     </div>
   )

@@ -211,7 +211,22 @@ export function SampleTable() {
             {imageUploadSampleId && (
               <ImageUploader
                 sampleId={imageUploadSampleId}
-                onUpload={() => setImageUploadSampleId(null)}
+                onUpload={(url, label) => {
+                  const updatedSamples = samples.map((sample) =>
+                    sample.id === imageUploadSampleId
+                      ? {
+                          ...sample,
+                          images: [
+                            ...(sample.images || []),
+                            { url, label },
+                          ],
+                        }
+                      : sample
+                  )
+                  setSamples(updatedSamples)
+                  setImageUploadSampleId(null)
+                }}              
+               
               />
             )}
           </DialogContent>
@@ -220,6 +235,7 @@ export function SampleTable() {
           </DialogActions>
         </ShadDialogContent>
       </Dialog>
+
     </>
   )
 }

@@ -1,9 +1,10 @@
+// SampleTable.tsx – mit vollständiger Bildverwaltung
 "use client"
 
 import { useMemo, useState } from "react"
 import {
   MaterialReactTable,
-  useMaterialReactTable,  
+  useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table"
 import {
@@ -19,13 +20,14 @@ import {
 import AddIcon from "@mui/icons-material/Add"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
+import CameraAltIcon from "@mui/icons-material/CameraAlt"
 import { useInformationStore } from "@/lib/store"
 import { Dialog, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import type { Sample } from "@/lib/store"
-import CameraAltIcon from "@mui/icons-material/CameraAlt"
 import ImageUploader from "@/components/image"
-
+import ImageGalleryModal from "@/components/ImageGalleryModal"
+import ImageCropperModal from "@/components/ImageCropperModal"
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
@@ -34,7 +36,9 @@ export function SampleTable() {
   const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null)
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [imageUploadSampleId, setImageUploadSampleId] = useState<number | null>(null)
+
+  const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
+  const [editImageIndex, setEditImageIndex] = useState<number | null>(null)
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -60,9 +64,7 @@ export function SampleTable() {
     if (modalMode === "create") {
       setSamples([...samples, activeSample])
     } else {
-      setSamples(
-        samples.map((s) => (s.id === activeSample.id ? activeSample : s))
-      )
+      setSamples(samples.map((s) => (s.id === activeSample.id ? activeSample : s)))
     }
     handleCloseModal()
   }
@@ -73,22 +75,10 @@ export function SampleTable() {
   }
 
   const columns = useMemo<MRT_ColumnDef<Sample>[]>(() => [
-    {
-      accessorKey: "productNumber",
-      header: "Product Number",
-    },
-    {
-      accessorKey: "productionDate",
-      header: "Production Date",
-    },
-    {
-      accessorKey: "serialNumber",
-      header: "Serial Number",
-    },
-    {
-      accessorKey: "features",
-      header: "Features",
-    },
+    { accessorKey: "productNumber", header: "Product Number" },
+    { accessorKey: "productionDate", header: "Production Date" },
+    { accessorKey: "serialNumber", header: "Serial Number" },
+    { accessorKey: "features", header: "Features" },
     {
       header: "Images",
       Cell: ({ row }) => (
@@ -119,123 +109,104 @@ export function SampleTable() {
             <DeleteIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Upload Image">
+        <Tooltip title="Manage Images">
           <IconButton
             color="primary"
-            onClick={() => setImageUploadSampleId(row.original.id)}
+            onClick={() => setImageGallerySample(row.original)}
           >
             <CameraAltIcon />
           </IconButton>
         </Tooltip>
       </Box>
-    ),    
+    ),
     renderTopToolbarCustomActions: () => (
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => handleOpenModal("create")}
-      >
+      <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
         Add Sample
       </Button>
     ),
-    muiTableContainerProps: {
-      sx: { minHeight: "400px", borderRadius: 2 },
-    },
+    muiTableContainerProps: { sx: { minHeight: "400px", borderRadius: 2 } },
   })
 
   return (
     <>
       <MaterialReactTable table={table} />
 
-      {/* Modal */}
+      {/* Create/Edit Sample */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <ShadDialogContent className="max-w-lg">
           <DialogTitle>
             {modalMode === "create" ? "Add New Sample" : "Edit Sample"}
           </DialogTitle>
           <DialogContent sx={{ display: "flex", flexDirection: "column", gap: "1rem", mt: 1 }}>
-            <TextField
-              label="Product Number"
-              value={activeSample?.productNumber ?? ""}
-              onChange={(e) =>
-                setActiveSample((prev) =>
-                  prev ? { ...prev, productNumber: e.target.value } : prev
-                )
-              }
-            />
-            <TextField
-              label="Production Date"
-              value={activeSample?.productionDate ?? ""}
-              onChange={(e) =>
-                setActiveSample((prev) =>
-                  prev ? { ...prev, productionDate: e.target.value } : prev
-                )
-              }
-            />
-            <TextField
-              label="Serial Number"
-              value={activeSample?.serialNumber ?? ""}
-              onChange={(e) =>
-                setActiveSample((prev) =>
-                  prev ? { ...prev, serialNumber: e.target.value } : prev
-                )
-              }
-            />
-            <TextField
-              label="Features"
-              value={activeSample?.features ?? ""}
-              onChange={(e) =>
-                setActiveSample((prev) =>
-                  prev ? { ...prev, features: e.target.value } : prev
-                )
-              }
-            />
-            <Label className="text-sm text-muted-foreground">
-              Sample Image Upload (kommt später)
-            </Label>
+            <TextField label="Product Number" value={activeSample?.productNumber ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, productNumber: e.target.value } : prev)} />
+            <TextField label="Production Date" value={activeSample?.productionDate ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, productionDate: e.target.value } : prev)} />
+            <TextField label="Serial Number" value={activeSample?.serialNumber ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, serialNumber: e.target.value } : prev)} />
+            <TextField label="Features" value={activeSample?.features ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, features: e.target.value } : prev)} />
+            <Label className="text-sm text-muted-foreground">Sample Image Upload (kommt später)</Label>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button onClick={handleSave} variant="contained">
-              Save
-            </Button>
+            <Button onClick={handleSave} variant="contained">Save</Button>
           </DialogActions>
         </ShadDialogContent>
       </Dialog>
 
-      {/* Modal für Bild-Upload */}
-      <Dialog open={!!imageUploadSampleId} onOpenChange={() => setImageUploadSampleId(null)}>
-        <ShadDialogContent className="max-w-3xl">
-          <DialogTitle>Upload Sample Image</DialogTitle>
-          <DialogContent>
-            {imageUploadSampleId && (
+      {/* Galerie-Modal */}
+      {imageGallerySample && (
+        <ImageGalleryModal
+          sample={imageGallerySample}
+          open={!!imageGallerySample}
+          onClose={() => {
+            setImageGallerySample(null)
+            setEditImageIndex(null)
+          }}
+          onAddNew={() => setEditImageIndex(-1)}
+          onEditImage={(index) => setEditImageIndex(index)}
+          onDeleteImage={(index) => {
+            const updated = imageGallerySample.images.filter((_, i) => i !== index)
+            setSamples(samples.map((s) => s.id === imageGallerySample.id ? { ...s, images: updated } : s))
+          }}
+        />
+      )}
+
+      {/* Zuschneiden-Modal */}
+      {imageGallerySample && editImageIndex !== null && editImageIndex >= 0 && (
+        <ImageCropperModal
+          sampleId={imageGallerySample.id}
+          open={true}
+          image={imageGallerySample.images[editImageIndex]}
+          index={editImageIndex}
+          onClose={() => setEditImageIndex(null)}
+          onSave={(newUrl, newLabel, idx) => {
+            const updatedImages = [...imageGallerySample.images]
+            updatedImages[idx] = { url: newUrl, label: newLabel }
+            setSamples(samples.map((s) => s.id === imageGallerySample.id ? { ...s, images: updatedImages } : s))
+            setEditImageIndex(null)
+          }}
+        />
+      )}
+
+      {/* Uploader bei Add New */}
+      {imageGallerySample && editImageIndex === -1 && (
+        <Dialog open={true} onOpenChange={() => setEditImageIndex(null)}>
+          <ShadDialogContent className="max-w-3xl">
+            <DialogTitle>Upload New Image</DialogTitle>
+            <DialogContent>
               <ImageUploader
-                sampleId={imageUploadSampleId}
+                sampleId={imageGallerySample.id}
                 onUpload={(url, label) => {
-                  const updatedSamples = samples.map((sample) =>
-                    sample.id === imageUploadSampleId
-                      ? {
-                          ...sample,
-                          images: [
-                            ...(sample.images || []),
-                            { url, label },
-                          ],
-                        }
-                      : sample
-                  )
-                  setSamples(updatedSamples)
-                  setImageUploadSampleId(null)
-                }}              
-               
+                  const updated = [...(imageGallerySample.images || []), { url, label }]
+                  setSamples(samples.map((s) => s.id === imageGallerySample.id ? { ...s, images: updated } : s))
+                  setEditImageIndex(null)
+                }}
               />
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setImageUploadSampleId(null)}>Close</Button>
-          </DialogActions>
-        </ShadDialogContent>
-      </Dialog>
-
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setEditImageIndex(null)}>Close</Button>
+            </DialogActions>
+          </ShadDialogContent>
+        </Dialog>
+      )}
     </>
   )
 }

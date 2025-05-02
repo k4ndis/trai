@@ -3,6 +3,7 @@
 
 import { useRef, useState } from "react"
 import Cropper from "react-cropper"
+import CropperType from "cropperjs"
 import "cropperjs/dist/cropper.css"
 import { supabase } from "@/lib/supabaseClient"
 import { Input } from "@/components/ui/input"
@@ -35,7 +36,7 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     if (!cropperRef.current || !imageSrc) return
     setUploading(true)
 
-    const cropper = (cropperRef.current as any)?.cropper
+    const cropper = (cropperRef.current as unknown as { cropper: CropperType }).cropper
     const canvas = cropper.getCroppedCanvas({
       width: 800,
       height: 600,

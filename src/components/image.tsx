@@ -4,7 +4,7 @@
 import { useRef, useState } from "react"
 import Cropper from "react-cropper"
 import CropperType from "cropperjs"
-import "cropperjs/dist/cropper.css"
+import "cropperjs/dist/cropper.min.css"
 import { supabase } from "@/lib/supabaseClient"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"

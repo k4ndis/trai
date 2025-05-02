@@ -1,7 +1,7 @@
 // src/components/MuiThemeWrapper.tsx
 "use client"
 
-import { ThemeProvider as MuiThemeProvider } from "@mui/material"
+import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { getMuiTheme } from "@/lib/mui_theme"
@@ -17,7 +17,7 @@ export default function MuiThemeWrapper({ children }: { children: React.ReactNod
 
   return (
     <MuiThemeProvider theme={muiTheme}>
-      
+      <CssBaseline />
       {children}
     </MuiThemeProvider>
   )

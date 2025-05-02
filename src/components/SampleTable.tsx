@@ -16,6 +16,7 @@ import {
   SortingState,
   RowSelectionState,
 } from "@tanstack/react-table"
+import type { Sample } from "@/lib/store"
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
@@ -51,7 +52,7 @@ export function SampleTable() {
     setOpenDeleteConfirm(false)
   }
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Sample>[] = [
     {
       id: "select",
       header: () => <input

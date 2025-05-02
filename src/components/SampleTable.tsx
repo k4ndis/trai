@@ -19,11 +19,13 @@ import {
 import AddIcon from "@mui/icons-material/Add"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
-
 import { useInformationStore } from "@/lib/store"
 import { Dialog, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import type { Sample } from "@/lib/store"
+import CameraAltIcon from "@mui/icons-material/CameraAlt"
+import ImageUploader from "@/components/image"
+
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
@@ -32,6 +34,7 @@ export function SampleTable() {
   const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null)
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [imageUploadSampleId, setImageUploadSampleId] = useState<number | null>(null)
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -116,8 +119,16 @@ export function SampleTable() {
             <DeleteIcon />
           </IconButton>
         </Tooltip>
+        <Tooltip title="Upload Image">
+          <IconButton
+            color="primary"
+            onClick={() => setImageUploadSampleId(row.original.id)}
+          >
+            <CameraAltIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
-    ),
+    ),    
     renderTopToolbarCustomActions: () => (
       <Button
         variant="contained"
@@ -188,6 +199,24 @@ export function SampleTable() {
             <Button onClick={handleSave} variant="contained">
               Save
             </Button>
+          </DialogActions>
+        </ShadDialogContent>
+      </Dialog>
+
+      {/* Modal für Bild-Upload */}
+      <Dialog open={!!imageUploadSampleId} onOpenChange={() => setImageUploadSampleId(null)}>
+        <ShadDialogContent className="max-w-3xl">
+          <DialogTitle>Upload Sample Image</DialogTitle>
+          <DialogContent>
+            {imageUploadSampleId && (
+              <ImageUploader
+                sampleId={imageUploadSampleId}
+                onUpload={() => setImageUploadSampleId(null)}
+              />
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setImageUploadSampleId(null)}>Close</Button>
           </DialogActions>
         </ShadDialogContent>
       </Dialog>

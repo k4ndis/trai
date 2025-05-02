@@ -84,17 +84,17 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
   }
 
   const handleZoom = (factor: number) => {
-    const cropper = (cropperRef.current as any)?.cropper
+    const cropper = (cropperRef.current as unknown as { cropper: CropperType })?.cropper
     cropper?.zoom(factor)
   }
 
   const handleRotate = () => {
-    const cropper = (cropperRef.current as any)?.cropper
+    const cropper = (cropperRef.current as unknown as { cropper: CropperType })?.cropper
     cropper?.rotate(90)
   }
 
   const handleReset = () => {
-    const cropper = (cropperRef.current as any)?.cropper
+    const cropper = (cropperRef.current as unknown as { cropper: CropperType })?.cropper
     cropper?.reset()
   }
 

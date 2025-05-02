@@ -1,85 +1,77 @@
 "use client"
 
-import { useState } from "react"
-import { useInformationStore } from "@/lib/store"
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogFooter } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import TraiButton from "@/components/ui/TraiButton"
-import AddIcon from "@mui/icons-material/Add"
-import DeleteIcon from "@mui/icons-material/Delete"
+import { useMemo, useState } from "react"
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  flexRender,
-  ColumnDef,
-  SortingState,
-  RowSelectionState,
-} from "@tanstack/react-table"
+  MaterialReactTable,
+  useMaterialReactTable,
+  MRT_EditActionButtons,
+  type MRT_ColumnDef,
+} from "material-react-table"
+import {
+  Box,
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  TextField,
+} from "@mui/material"
+import AddIcon from "@mui/icons-material/Add"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+
+import { useInformationStore } from "@/lib/store"
+import { Dialog, DialogTrigger, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import type { Sample } from "@/lib/store"
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
 
-  const [openAdd, setOpenAdd] = useState(false)
-  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false)
-  const [newSample, setNewSample] = useState({
-    productNumber: "",
-    productionDate: "",
-    serialNumber: "",
-    features: "",
-  })
+  const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null)
+  const [activeSample, setActiveSample] = useState<Sample | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-
-  const selectedIds = Object.keys(rowSelection).map(Number)
-
-  const handleAddSample = () => {
-    const id = Date.now()
-    setSamples([
-      ...samples,
-      { id, ...newSample, images: [] }
-    ])
-    setNewSample({ productNumber: "", productionDate: "", serialNumber: "", features: "" })
-    setOpenAdd(false)
+  const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
+    setModalMode(mode)
+    setActiveSample(sample ?? {
+      id: Date.now(),
+      productNumber: "",
+      productionDate: "",
+      serialNumber: "",
+      features: "",
+      images: [],
+    })
+    setDialogOpen(true)
   }
 
-  const handleDeleteSelected = () => {
-    setSamples(samples.filter(sample => !selectedIds.includes(sample.id)))
-    setRowSelection({})
-    setOpenDeleteConfirm(false)
+  const handleCloseModal = () => {
+    setModalMode(null)
+    setActiveSample(null)
+    setDialogOpen(false)
   }
 
-  const columns: ColumnDef<Sample>[] = [
-    {
-      id: "select",
-      header: () => <input
-        type="checkbox"
-        checked={Object.keys(rowSelection).length === samples.length}
-        onChange={(e) => {
-          const checked = e.target.checked
-          const newSelection = samples.reduce((acc, sample) => {
-            acc[sample.id] = checked
-            return acc
-          }, {} as RowSelectionState)
-          setRowSelection(checked ? newSelection : {})
-        }}
-      />,
-      cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-        />
-      ),
-    },
-    {
-      accessorKey: "id",
-      header: "No",
-      cell: info => info.row.index + 1,
-    },
+  const handleSave = () => {
+    if (!activeSample) return
+    if (modalMode === "create") {
+      setSamples([...samples, activeSample])
+    } else {
+      setSamples(
+        samples.map((s) => (s.id === activeSample.id ? activeSample : s))
+      )
+    }
+    handleCloseModal()
+  }
+
+  const handleDelete = (id: number) => {
+    const confirm = window.confirm("Are you sure you want to delete this sample?")
+    if (confirm) setSamples(samples.filter((s) => s.id !== id))
+  }
+
+  const columns = useMemo<MRT_ColumnDef<Sample>[]>(() => [
     {
       accessorKey: "productNumber",
       header: "Product Number",
@@ -96,99 +88,111 @@ export function SampleTable() {
       accessorKey: "features",
       header: "Features",
     },
-  ]
-
-  const table = useReactTable({
-    data: samples,
-    columns,
-    state: {
-      sorting,
-      rowSelection,
+    {
+      header: "Images",
+      Cell: ({ row }) => (
+        <span className="text-muted-foreground text-sm">
+          {row.original.images?.length || 0} 📷
+        </span>
+      ),
     },
-    onSortingChange: setSorting,
-    onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+  ], [])
+
+  const table = useMaterialReactTable({
+    columns,
+    data: samples,
     enableRowSelection: true,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    createDisplayMode: "modal",
+    getRowId: (row) => row.id.toString(),
+    renderRowActions: ({ row }) => (
+      <Box sx={{ display: "flex", gap: "0.5rem" }}>
+        <Tooltip title="Edit">
+          <IconButton onClick={() => handleOpenModal("edit", row.original)}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+    renderTopToolbarCustomActions: () => (
+      <Button
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={() => handleOpenModal("create")}
+      >
+        Add Sample
+      </Button>
+    ),
+    muiTableContainerProps: {
+      sx: { minHeight: "400px", borderRadius: 2 },
+    },
   })
 
   return (
-    <div className="space-y-4">
-      {/* Topbar */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-2xl font-bold w-full md:w-auto">Samples</h2>
-        <div className="flex w-full md:w-auto gap-2 items-center">
-          {/* Delete */}
-          <Dialog open={openDeleteConfirm} onOpenChange={setOpenDeleteConfirm}>
-            <DialogTrigger asChild>
-              <TraiButton
-                color="error"
-                startIcon={<DeleteIcon />}
-                disabled={selectedIds.length === 0}
-              >
-                Delete Selected
-              </TraiButton>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader className="text-lg font-bold">Confirm Deletion</DialogHeader>
-              <p>Are you sure you want to delete the selected samples?</p>
-              <DialogFooter className="mt-4">
-                <TraiButton onClick={() => setOpenDeleteConfirm(false)}>
-                  Cancel
-                </TraiButton>
-                <TraiButton color="error" onClick={handleDeleteSelected}>
-                  Delete
-                </TraiButton>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+    <>
+      <MaterialReactTable table={table} />
 
-          {/* Add */}
-          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-            <DialogTrigger>
-              <TraiButton startIcon={<AddIcon />}>Add Sample</TraiButton>
-            </DialogTrigger>
-            <DialogContent>
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Add New Sample</h3>
-                <Input placeholder="Product Number" value={newSample.productNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, productNumber: e.target.value }))} />
-                <Input placeholder="Production Date" value={newSample.productionDate} onChange={(e) => setNewSample((prev) => ({ ...prev, productionDate: e.target.value }))} />
-                <Input placeholder="Serial Number" value={newSample.serialNumber} onChange={(e) => setNewSample((prev) => ({ ...prev, serialNumber: e.target.value }))} />
-                <Input placeholder="Features" value={newSample.features} onChange={(e) => setNewSample((prev) => ({ ...prev, features: e.target.value }))} />
-                <TraiButton onClick={handleAddSample}>Save Sample</TraiButton>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto rounded-md border">
-        <table className="min-w-full text-sm">
-          <thead className="bg-muted">
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th key={header.id} className="px-4 py-2 text-left">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="border-t hover:bg-muted/50">
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-4 py-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      {/* Modal */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <ShadDialogContent className="max-w-lg">
+          <DialogTitle>
+            {modalMode === "create" ? "Add New Sample" : "Edit Sample"}
+          </DialogTitle>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: "1rem", mt: 1 }}>
+            <TextField
+              label="Product Number"
+              value={activeSample?.productNumber ?? ""}
+              onChange={(e) =>
+                setActiveSample((prev) =>
+                  prev ? { ...prev, productNumber: e.target.value } : prev
+                )
+              }
+            />
+            <TextField
+              label="Production Date"
+              value={activeSample?.productionDate ?? ""}
+              onChange={(e) =>
+                setActiveSample((prev) =>
+                  prev ? { ...prev, productionDate: e.target.value } : prev
+                )
+              }
+            />
+            <TextField
+              label="Serial Number"
+              value={activeSample?.serialNumber ?? ""}
+              onChange={(e) =>
+                setActiveSample((prev) =>
+                  prev ? { ...prev, serialNumber: e.target.value } : prev
+                )
+              }
+            />
+            <TextField
+              label="Features"
+              value={activeSample?.features ?? ""}
+              onChange={(e) =>
+                setActiveSample((prev) =>
+                  prev ? { ...prev, features: e.target.value } : prev
+                )
+              }
+            />
+            <Label className="text-sm text-muted-foreground">
+              Sample Image Upload (kommt später)
+            </Label>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseModal}>Cancel</Button>
+            <Button onClick={handleSave} variant="contained">
+              Save
+            </Button>
+          </DialogActions>
+        </ShadDialogContent>
+      </Dialog>
+    </>
   )
 }

@@ -194,9 +194,11 @@ export function SampleTable() {
                 sampleId={imageGallerySample.id}
                 onUpload={(url, label) => {
                   const updated = [...(imageGallerySample.images || []), { url, label }]
-                  setSamples(samples.map((s) => s.id === imageGallerySample.id ? { ...s, images: updated } : s))
+                  const updatedSample = { ...imageGallerySample, images: updated }
+                  setSamples(samples.map((s) => s.id === updatedSample.id ? updatedSample : s))
+                  setImageGallerySample(updatedSample)
                   setEditImageIndex(null)
-                }}
+                }}                
               />
             </DialogContent>
             <DialogActions>

@@ -17,7 +17,7 @@ export default function MuiThemeWrapper({ children }: { children: React.ReactNod
 
   return (
     <MuiThemeProvider theme={muiTheme}>
-      <CssBaseline />
+      
       {children}
     </MuiThemeProvider>
   )

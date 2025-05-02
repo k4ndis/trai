@@ -69,7 +69,7 @@ export default function ImageCropperModal({
       return
     }
 
-    const publicUrl = supabase.storage.from("trai").getPublicUrl(fileName).data.publicUrl
+    const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/trai/${fileName}`
     onSave(publicUrl, label, index)
     setUploading(false)
     onClose()

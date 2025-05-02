@@ -3,8 +3,7 @@
 import { useMemo, useState } from "react"
 import {
   MaterialReactTable,
-  useMaterialReactTable,
-  MRT_EditActionButtons,
+  useMaterialReactTable,  
   type MRT_ColumnDef,
 } from "material-react-table"
 import {
@@ -22,9 +21,8 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 
 import { useInformationStore } from "@/lib/store"
-import { Dialog, DialogTrigger, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import type { Sample } from "@/lib/store"
 
 export function SampleTable() {

@@ -8,6 +8,8 @@ import Cropper from "react-cropper"
 import CropperType from "cropperjs"
 import { useRef, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
+import { Label } from "@/components/ui/label"
+import { RotateCcw, ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
 
 interface Props {
   sampleId: number
@@ -73,12 +75,27 @@ export default function ImageCropperModal({
     onClose()
   }
 
+  const handleZoom = (factor: number) => {
+    const cropper = (cropperRef.current as any)?.cropper
+    cropper?.zoom(factor)
+  }
+
+  const handleRotate = () => {
+    const cropper = (cropperRef.current as any)?.cropper
+    cropper?.rotate(90)
+  }
+
+  const handleReset = () => {
+    const cropper = (cropperRef.current as any)?.cropper
+    cropper?.reset()
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl space-y-4">
         <h2 className="text-xl font-semibold">Edit Image</h2>
 
-        <div className="aspect-[4/3] bg-black">
+        <div className="aspect-[4/3] w-full max-w-3xl mx-auto">
           <Cropper
             src={image.url}
             style={{ height: 400, width: "100%" }}
@@ -92,9 +109,17 @@ export default function ImageCropperModal({
           />
         </div>
 
-        <div>
-          <label className="block mb-1 text-sm font-medium">Image Label</label>
+        <div className="flex justify-center gap-3 flex-wrap">
+          <Button size="icon" variant="secondary" onClick={() => handleZoom(0.1)}><ZoomIn className="w-4 h-4" /></Button>
+          <Button size="icon" variant="secondary" onClick={() => handleZoom(-0.1)}><ZoomOut className="w-4 h-4" /></Button>
+          <Button size="icon" variant="secondary" onClick={handleRotate}><RotateCcw className="w-4 h-4" /></Button>
+          <Button size="icon" variant="secondary" onClick={handleReset}><Maximize2 className="w-4 h-4" /></Button>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="label">Image Label</Label>
           <Textarea
+            id="label"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             placeholder="Optional description..."

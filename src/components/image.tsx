@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import "@/styles/cropper.css";
-
+import { RotateCcw, ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
+import "@/styles/cropper.css"
 
 interface Props {
   sampleId: number
@@ -67,9 +67,7 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       .upload(fileName, blob, {
         contentType: "image/jpeg",
         upsert: true,
-        metadata: {
-          owner: userId,
-        },
+        metadata: { owner: userId },
       })
 
     if (uploadResult.error) {
@@ -85,38 +83,62 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     setUploading(false)
   }
 
+  const handleZoom = (factor: number) => {
+    const cropper = (cropperRef.current as any)?.cropper
+    cropper?.zoom(factor)
+  }
+
+  const handleRotate = () => {
+    const cropper = (cropperRef.current as any)?.cropper
+    cropper?.rotate(90)
+  }
+
+  const handleReset = () => {
+    const cropper = (cropperRef.current as any)?.cropper
+    cropper?.reset()
+  }
+
   return (
-    <div className="border p-4 rounded space-y-4 bg-muted">
-      <Label className="block">Upload Image</Label>
-      <Input type="file" accept="image/*" onChange={onFileChange} />
+    <div className="space-y-4 p-6 bg-background rounded-xl border shadow-sm">
+      <div className="space-y-2">
+        <Label htmlFor="file">Select Image</Label>
+        <Input id="file" type="file" accept="image/*" onChange={onFileChange} />
+      </div>
 
       {imageSrc && (
-        <div className="relative w-full max-w-md aspect-[4/3] bg-black mt-4 mx-auto">
-          <Cropper
-            src={imageSrc}
-            style={{ height: 300, width: "100%" }}
-            aspectRatio={4 / 3}
-            guides={false}
-            ref={cropperRef}
-            viewMode={1}
-            background={false}
-            responsive={true}
-            checkOrientation={false}
-          />
-        </div>
-      )}
+        <div className="space-y-4">
+          <div className="aspect-[4/3] w-full max-w-2xl mx-auto">
+            <Cropper
+              src={imageSrc}
+              style={{ height: 400, width: "100%" }}
+              aspectRatio={4 / 3}
+              guides={true}
+              ref={cropperRef}
+              viewMode={1}
+              background={false}
+              responsive={true}
+              checkOrientation={false}
+            />
+          </div>
 
-      {imageSrc && (
-        <div className="space-y-2">
-          <Label>Comment</Label>
-          <Textarea
-            placeholder="Comment"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-          />
-          <Button onClick={handleUpload} disabled={uploading}>
-            {uploading ? "Hochladen..." : "Upload & Save"}
-          </Button>
+          <div className="flex justify-center gap-3 flex-wrap">
+            <Button size="icon" variant="secondary" onClick={() => handleZoom(0.1)}><ZoomIn className="w-4 h-4" /></Button>
+            <Button size="icon" variant="secondary" onClick={() => handleZoom(-0.1)}><ZoomOut className="w-4 h-4" /></Button>
+            <Button size="icon" variant="secondary" onClick={handleRotate}><RotateCcw className="w-4 h-4" /></Button>
+            <Button size="icon" variant="secondary" onClick={handleReset}><Maximize2 className="w-4 h-4" /></Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Label / Comment</Label>
+            <Textarea
+              placeholder="Kommentar zum Bild (optional)"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+            />
+            <Button onClick={handleUpload} disabled={uploading}>
+              {uploading ? "Hochladen..." : "Upload & Save"}
+            </Button>
+          </div>
         </div>
       )}
     </div>

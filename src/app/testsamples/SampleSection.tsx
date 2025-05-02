@@ -21,8 +21,7 @@ export interface Sample {
 
 export function SampleSection() {
   return (
-    <Container id="testsamples">
-      <Label className="text-lg mb-4 block">Test Samples</Label>
+    <Container id="testsamples">      
       <SampleTable />
     </Container>
   )

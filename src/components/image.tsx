@@ -1,8 +1,9 @@
 // src/components/image.tsx
 "use client"
 
-import { useState, useCallback } from "react"
-import Cropper, { Area } from "react-easy-crop"
+import { useRef, useState } from "react"
+import Cropper from "react-cropper"
+import "cropperjs/dist/cropper.css"
 import { supabase } from "@/lib/supabaseClient"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -15,14 +16,12 @@ interface Props {
 }
 
 export default function ImageUploader({ sampleId, onUpload }: Props) {
+  const cropperRef = useRef<HTMLImageElement>(null)
   const [imageSrc, setImageSrc] = useState<string | null>(null)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
   const [label, setLabel] = useState("")
   const [uploading, setUploading] = useState(false)
 
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
@@ -32,30 +31,38 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
     reader.readAsDataURL(file)
   }
 
-  const onCropComplete = useCallback((_croppedArea: Area, croppedPixels: Area) => {
-    setCroppedAreaPixels(croppedPixels)
-  }, [])
-
   const handleUpload = async () => {
-    if (!imageSrc || !croppedAreaPixels) return
+    if (!cropperRef.current || !imageSrc) return
     setUploading(true)
 
-    // Aktuellen User holen
-    const { data: userData } = await supabase.auth.getUser()
-    const userId = userData?.user?.id
+    const cropper = (cropperRef.current as any)?.cropper
+    const canvas = cropper.getCroppedCanvas({
+      width: 800,
+      height: 600,
+      fillColor: "#fff",
+    })
 
-    if (!userId) {
-      alert("Kein eingeloggter Benutzer gefunden.")
+    const blob: Blob | null = await new Promise((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg")
+    )
+    if (!blob) {
+      alert("Zuschneiden fehlgeschlagen.")
       setUploading(false)
       return
     }
 
-    const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels)
-    const fileName = `sample-${sampleId}-${Date.now()}.jpg`
+    const { data: userData } = await supabase.auth.getUser()
+    const userId = userData?.user?.id
+    if (!userId) {
+      alert("Kein Benutzer eingeloggt.")
+      setUploading(false)
+      return
+    }
 
+    const fileName = `sample-${sampleId}-${Date.now()}.jpg`
     const uploadResult = await supabase.storage
       .from("trai")
-      .upload(fileName, croppedBlob, {
+      .upload(fileName, blob, {
         contentType: "image/jpeg",
         upsert: true,
         metadata: {
@@ -84,13 +91,15 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       {imageSrc && (
         <div className="relative w-full max-w-md aspect-[4/3] bg-black mt-4 mx-auto">
           <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            aspect={4 / 3}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
+            src={imageSrc}
+            style={{ height: 300, width: "100%" }}
+            aspectRatio={4 / 3}
+            guides={false}
+            ref={cropperRef}
+            viewMode={1}
+            background={false}
+            responsive={true}
+            checkOrientation={false}
           />
         </div>
       )}
@@ -110,35 +119,4 @@ export default function ImageUploader({ sampleId, onUpload }: Props) {
       )}
     </div>
   )
-}
-
-// Hilfsfunktion zum Zuschneiden (wie früher in cropImage.ts ausgelagert)
-async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
-  const image = new Image()
-  image.src = imageSrc
-  await new Promise((resolve) => (image.onload = resolve))
-
-  const canvas = document.createElement("canvas")
-  canvas.width = pixelCrop.width
-  canvas.height = pixelCrop.height
-  const ctx = canvas.getContext("2d")!
-
-  ctx.drawImage(
-    image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-    0,
-    0,
-    pixelCrop.width,
-    pixelCrop.height
-  )
-
-  return await new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      if (!blob) throw new Error("Canvas blob ist leer.")
-      resolve(blob)
-    }, "image/jpeg")
-  })
 }

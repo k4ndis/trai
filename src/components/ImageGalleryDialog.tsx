@@ -17,11 +17,6 @@ import { supabase } from "@/lib/supabaseClient";
 import ClientOnlyEditor from "./ClientOnlyEditor";
 
 
-const FilerobotImageEditor = dynamic(
-  () => import("react-filerobot-image-editor"),
-  { ssr: false }
-);
-
 interface ImageEntry {
   url: string;
   label: string;

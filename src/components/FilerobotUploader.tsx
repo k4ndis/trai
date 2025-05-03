@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Box,
   Button,
@@ -9,9 +10,14 @@ import {
   Stack,
 } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
-import FilerobotImageEditor, { TABS, TOOLS } from "react-filerobot-image-editor";
-import "filerobot-image-editor/dist/style.css";
+import { TABS, TOOLS } from "react-filerobot-image-editor"; // TABS & TOOLS direkt
 import { supabase } from "@/lib/supabaseClient";
+
+// Dynamischer Import (nur Client-Seite)
+const FilerobotImageEditor = dynamic(
+  () => import("react-filerobot-image-editor"),
+  { ssr: false }
+);
 
 interface Props {
   sampleId: number;

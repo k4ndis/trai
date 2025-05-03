@@ -11,9 +11,15 @@ import {
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import FilerobotUploader from "./FilerobotUploader";
-import FilerobotImageEditor from "react-filerobot-image-editor";
+import { TABS, TOOLS } from "react-filerobot-image-editor";
 import { supabase } from "@/lib/supabaseClient";
+
+const FilerobotImageEditor = dynamic(
+  () => import("react-filerobot-image-editor"),
+  { ssr: false }
+);
 
 interface ImageEntry {
   url: string;
@@ -50,23 +56,25 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
     setEditingLabel(img.label);
   };
 
-  const handleEditorSave = async (edited: any) => {
-    if (!edited.imageBase64 || editImageIndex === null) return;
-    const response = await fetch(edited.imageBase64);
+  const handleEditorSave = async (imageBase64: string) => {
+    if (!imageBase64 || editImageIndex === null) return;
+  
+    const response = await fetch(imageBase64);
     const blob = await response.blob();
     const fileName = `sample-${sample.id}-${Date.now()}.jpg`;
     const { error } = await supabase.storage.from("trai").upload(fileName, blob);
     if (error) return console.error("Upload error", error);
-
+  
     const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/trai/${fileName}`;
     const updatedImages = [...(sample.images || [])];
     updatedImages[editImageIndex] = { url: publicUrl, label: editingLabel };
     onUpdate({ ...sample, images: updatedImages });
-
+  
     setEditImageIndex(null);
     setEditorSource(null);
     setEditingLabel("");
   };
+  
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -110,20 +118,23 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
 
         {editorSource && (
           <FilerobotImageEditor
-            source={editorSource}
-            onSave={handleEditorSave}
-            onClose={() => {
-              setEditImageIndex(null);
-              setEditorSource(null);
-              setEditingLabel("");
-            }}
-            savingPixelRatio={1}
-            previewPixelRatio={1}
-            annotationsCommon={{ fill: "#ff0000" }}
-            Text={{ text: editingLabel || "Kommentar" }}
-            tabsIds={["Adjust", "Annotate", "Watermark"]}
-            defaultTabId="Adjust"
-          />
+          source={editorSource}
+          onSave={({ imageBase64 }) => {
+            if (imageBase64) handleEditorSave(imageBase64);
+          }}
+          onClose={() => {
+            setEditImageIndex(null);
+            setEditorSource(null);
+            setEditingLabel("");
+          }}
+          annotationsCommon={{ fill: "#ff0000" }}
+          Text={{ text: editingLabel || "Kommentar" }}
+          tabsIds={[TABS.ADJUST, TABS.ANNOTATE, TABS.WATERMARK]}
+          defaultTabId={TABS.ADJUST}
+          defaultToolId={TOOLS.CROP}
+          savingPixelRatio={1}
+          previewPixelRatio={1}
+        />        
         )}
       </DialogContent>
       <DialogActions>

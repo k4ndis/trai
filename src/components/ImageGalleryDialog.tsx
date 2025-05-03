@@ -1,3 +1,4 @@
+// components/ImageGalleryDialog.tsx
 "use client";
 
 import {
@@ -11,11 +12,8 @@ import {
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
-import dynamic from "next/dynamic";
-import FilerobotUploader from "./FilerobotUploader";
 import { supabase } from "@/lib/supabaseClient";
-import ClientOnlyEditor from "./ClientOnlyEditor";
-
+import ImageEditorModal from "./imageeditor";
 
 interface ImageEntry {
   url: string;
@@ -37,7 +35,6 @@ interface Props {
 export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: Props) {
   const [editImageIndex, setEditImageIndex] = useState<number | null>(null);
   const [editorSource, setEditorSource] = useState<string | null>(null);
-  const [editingLabel, setEditingLabel] = useState<string>("");
 
   const handleDelete = (index: number) => {
     const updatedImages = sample.images?.filter((_, i) => i !== index) || [];
@@ -49,28 +46,24 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
     if (!img) return;
     setEditImageIndex(index);
     setEditorSource(img.url);
-    setEditingLabel(img.label);
   };
 
-  const handleEditorSave = async (imageBase64: string) => {
-    if (!imageBase64 || editImageIndex === null) return;
-  
-    const response = await fetch(imageBase64);
-    const blob = await response.blob();
+  const handleEditorSave = async (blob: Blob, label: string) => {
+    if (editImageIndex === null) return;
     const fileName = `sample-${sample.id}-${Date.now()}.jpg`;
     const { error } = await supabase.storage.from("trai").upload(fileName, blob);
-    if (error) return console.error("Upload error", error);
-  
+    if (error) {
+      console.error("Upload error", error);
+      return;
+    }
     const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/trai/${fileName}`;
     const updatedImages = [...(sample.images || [])];
-    updatedImages[editImageIndex] = { url: publicUrl, label: editingLabel };
+    updatedImages[editImageIndex] = { url: publicUrl, label };
     onUpdate({ ...sample, images: updatedImages });
-  
+
     setEditImageIndex(null);
     setEditorSource(null);
-    setEditingLabel("");
   };
-  
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -99,31 +92,16 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
           ))}
         </div>
 
-        <div className="mt-6">
-          <Typography variant="subtitle1" gutterBottom>
-            Neues Bild hochladen
-          </Typography>
-          <FilerobotUploader
-            sampleId={sample.id}
-            onUpload={(url, label) => {
-              const updated = [...(sample.images || []), { url, label }];
-              onUpdate({ ...sample, images: updated });
-            }}
-          />
-        </div>
-
-        {editorSource && (
-          <ClientOnlyEditor
-            source={editorSource}
-            label={editingLabel}
-            onSave={handleEditorSave}
-            onClose={() => {
-              setEditImageIndex(null);
-              setEditorSource(null);
-              setEditingLabel("");
-            }}
-          />
-        )}
+        {/* Editor-Modal (zuschneiden, beschriften, speichern) */}
+        <ImageEditorModal
+          open={editorSource !== null}
+          image={editorSource || ""}
+          onClose={() => {
+            setEditImageIndex(null);
+            setEditorSource(null);
+          }}
+          onSave={handleEditorSave}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Schließen</Button>

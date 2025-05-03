@@ -13,8 +13,9 @@ import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import FilerobotUploader from "./FilerobotUploader";
-import { TABS, TOOLS } from "react-filerobot-image-editor";
 import { supabase } from "@/lib/supabaseClient";
+import ClientOnlyEditor from "./ClientOnlyEditor";
+
 
 const FilerobotImageEditor = dynamic(
   () => import("react-filerobot-image-editor"),
@@ -117,24 +118,16 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
         </div>
 
         {editorSource && (
-          <FilerobotImageEditor
-          source={editorSource}
-          onSave={({ imageBase64 }) => {
-            if (imageBase64) handleEditorSave(imageBase64);
-          }}
-          onClose={() => {
-            setEditImageIndex(null);
-            setEditorSource(null);
-            setEditingLabel("");
-          }}
-          annotationsCommon={{ fill: "#ff0000" }}
-          Text={{ text: editingLabel || "Kommentar" }}
-          tabsIds={[TABS.ADJUST, TABS.ANNOTATE, TABS.WATERMARK]}
-          defaultTabId={TABS.ADJUST}
-          defaultToolId={TOOLS.CROP}
-          savingPixelRatio={1}
-          previewPixelRatio={1}
-        />        
+          <ClientOnlyEditor
+            source={editorSource}
+            label={editingLabel}
+            onSave={handleEditorSave}
+            onClose={() => {
+              setEditImageIndex(null);
+              setEditorSource(null);
+              setEditingLabel("");
+            }}
+          />
         )}
       </DialogContent>
       <DialogActions>

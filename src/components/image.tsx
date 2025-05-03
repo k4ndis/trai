@@ -1,3 +1,5 @@
+// ⚠️ [Hinweis] Diese Datei wird nicht mehr verwendet. Ersatz: FilerobotUploader.tsx
+
 // src/components/image.tsx
 "use client"
 

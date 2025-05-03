@@ -1,4 +1,3 @@
-// SampleTable.tsx – mit vollständiger Bildverwaltung
 "use client"
 
 import { useMemo, useState } from "react"
@@ -24,9 +23,7 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt"
 import { useInformationStore } from "@/lib/store"
 import { Dialog, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
 import type { Sample } from "@/lib/store"
-import ImageUploader from "@/components/image"
-import ImageGalleryModal from "@/components/ImageGalleryModal"
-import ImageCropperModal from "@/components/ImageCropperModal"
+import ImageGalleryDialog from "@/components/ImageGalleryDialog"
 
 export function SampleTable() {
   const samples = useInformationStore((state) => state.samples)
@@ -35,9 +32,7 @@ export function SampleTable() {
   const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null)
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
-  const [editImageIndex, setEditImageIndex] = useState<number | null>(null)
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -140,7 +135,7 @@ export function SampleTable() {
             <TextField label="Product Number" value={activeSample?.productNumber ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, productNumber: e.target.value } : prev)} />
             <TextField label="Production Date" value={activeSample?.productionDate ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, productionDate: e.target.value } : prev)} />
             <TextField label="Serial Number" value={activeSample?.serialNumber ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, serialNumber: e.target.value } : prev)} />
-            <TextField label="Features" value={activeSample?.features ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, features: e.target.value } : prev)} />            
+            <TextField label="Features" value={activeSample?.features ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, features: e.target.value } : prev)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseModal}>Cancel</Button>
@@ -149,63 +144,22 @@ export function SampleTable() {
         </ShadDialogContent>
       </Dialog>
 
-      {/* Galerie-Modal */}
+      {/* Galerie-Dialog mit Filerobot */}
       {imageGallerySample && (
-        <ImageGalleryModal
+        <ImageGalleryDialog
           sample={imageGallerySample}
           open={!!imageGallerySample}
-          onClose={() => {
-            setImageGallerySample(null)
-            setEditImageIndex(null)
-          }}
-          onAddNew={() => setEditImageIndex(-1)}
-          onEditImage={(index) => setEditImageIndex(index)}
-          onDeleteImage={(index) => {
-            const updated = imageGallerySample.images.filter((_, i) => i !== index)
-            setSamples(samples.map((s) => s.id === imageGallerySample.id ? { ...s, images: updated } : s))
-          }}
+          onClose={() => setImageGallerySample(null)}
+          onUpdate={(updated) => {
+            setSamples(samples.map((s) =>
+              s.id === updated.id ? { ...s, images: updated.images ?? [] } : s
+            ))
+            
+            setImageGallerySample((prev) =>
+              prev ? { ...prev, images: updated.images ?? [] } : null
+            )            
+          }}          
         />
-      )}
-
-      {/* Zuschneiden-Modal */}
-      {imageGallerySample && editImageIndex !== null && editImageIndex >= 0 && (
-        <ImageCropperModal
-          sampleId={imageGallerySample.id}
-          open={true}
-          image={imageGallerySample.images[editImageIndex]}
-          index={editImageIndex}
-          onClose={() => setEditImageIndex(null)}
-          onSave={(newUrl, newLabel, idx) => {
-            const updatedImages = [...imageGallerySample.images]
-            updatedImages[idx] = { url: newUrl, label: newLabel }
-            setSamples(samples.map((s) => s.id === imageGallerySample.id ? { ...s, images: updatedImages } : s))
-            setEditImageIndex(null)
-          }}
-        />
-      )}
-
-      {/* Uploader bei Add New */}
-      {imageGallerySample && editImageIndex === -1 && (
-        <Dialog open={true} onOpenChange={() => setEditImageIndex(null)}>
-          <ShadDialogContent className="max-w-3xl">
-            <DialogTitle>Upload New Image</DialogTitle>
-            <DialogContent>
-              <ImageUploader
-                sampleId={imageGallerySample.id}
-                onUpload={(url, label) => {
-                  const updated = [...(imageGallerySample.images || []), { url, label }]
-                  const updatedSample = { ...imageGallerySample, images: updated }
-                  setSamples(samples.map((s) => s.id === updatedSample.id ? updatedSample : s))
-                  setImageGallerySample(updatedSample)
-                  setEditImageIndex(null)
-                }}                
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setEditImageIndex(null)}>Close</Button>
-            </DialogActions>
-          </ShadDialogContent>
-        </Dialog>
       )}
     </>
   )

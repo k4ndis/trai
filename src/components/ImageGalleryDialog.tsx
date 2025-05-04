@@ -7,8 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  IconButton,
-  Typography,
+  IconButton, 
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";

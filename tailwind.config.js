@@ -9,8 +9,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#00f5cc",             // Hauptfarbe (Logo-Grün)
-        "primary-dark": "#00c9a9",      // dunklere Version (optional, z. B. Hover oder Dark Mode)
+        primary: "#00c9a9",             // Hauptfarbe (Logo-Grün)
+        "primary-dark": "#00f5cc",      // dunklere Version (optional, z. B. Hover oder Dark Mode)
       },
     },
   },

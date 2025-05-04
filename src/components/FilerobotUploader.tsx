@@ -5,9 +5,7 @@ import dynamic from "next/dynamic";
 import {
   Box,
   Button,
-  CircularProgress,
-  Typography,
-  Stack,
+  CircularProgress,  
 } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import { TABS, TOOLS } from "react-filerobot-image-editor"; // TABS & TOOLS direkt

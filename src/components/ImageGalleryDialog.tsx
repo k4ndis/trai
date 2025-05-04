@@ -1,4 +1,3 @@
-// components/ImageGalleryDialog.tsx
 "use client";
 
 import {
@@ -7,9 +6,11 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  IconButton, 
+  IconButton,
+  Box,
+  Tooltip,
 } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, AddAPhoto } from "@mui/icons-material";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import ImageEditorModal from "./imageeditor";
@@ -34,6 +35,7 @@ interface Props {
 export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: Props) {
   const [editImageIndex, setEditImageIndex] = useState<number | null>(null);
   const [editorSource, setEditorSource] = useState<string | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
   const handleDelete = (index: number) => {
     const updatedImages = sample.images?.filter((_, i) => i !== index) || [];
@@ -45,10 +47,16 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
     if (!img) return;
     setEditImageIndex(index);
     setEditorSource(img.url);
+    setIsAddingNew(false);
+  };
+
+  const handleAddNew = () => {
+    setIsAddingNew(true);
+    setEditorSource(""); // leeres Bild
+    setEditImageIndex(null);
   };
 
   const handleEditorSave = async (blob: Blob, label: string) => {
-    if (editImageIndex === null) return;
     const fileName = `sample-${sample.id}-${Date.now()}.jpg`;
     const { error } = await supabase.storage.from("trai").upload(fileName, blob);
     if (error) {
@@ -56,17 +64,35 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
       return;
     }
     const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/trai/${fileName}`;
+
     const updatedImages = [...(sample.images || [])];
-    updatedImages[editImageIndex] = { url: publicUrl, label };
+
+    if (isAddingNew) {
+      updatedImages.push({ url: publicUrl, label });
+    } else if (editImageIndex !== null) {
+      updatedImages[editImageIndex] = { url: publicUrl, label };
+    }
+
     onUpdate({ ...sample, images: updatedImages });
 
     setEditImageIndex(null);
     setEditorSource(null);
+    setIsAddingNew(false);
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Bilder für Sample {sample.id}</DialogTitle>
+      <DialogTitle>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          Sample Images {sample.id}
+          <Tooltip title="Add Image">
+            <IconButton onClick={handleAddNew} color="primary">
+              <AddAPhoto />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </DialogTitle>
+
       <DialogContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {sample.images?.map((img, i) => (
@@ -91,17 +117,18 @@ export default function ImageGalleryDialog({ open, sample, onClose, onUpdate }: 
           ))}
         </div>
 
-        {/* Editor-Modal (zuschneiden, beschriften, speichern) */}
         <ImageEditorModal
           open={editorSource !== null}
           image={editorSource || ""}
           onClose={() => {
             setEditImageIndex(null);
             setEditorSource(null);
+            setIsAddingNew(false);
           }}
           onSave={handleEditorSave}
         />
       </DialogContent>
+
       <DialogActions>
         <Button onClick={onClose}>Schließen</Button>
       </DialogActions>

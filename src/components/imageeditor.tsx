@@ -1,8 +1,5 @@
 "use client";
 
-// components/imageeditor.tsx
-// MUI + Cropper Editor mit Seitenpanel, Upload & Galerie
-
 import React, { useRef, useState } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
@@ -102,10 +99,10 @@ export default function ImageEditorModal({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>Bild bearbeiten</DialogTitle>
+      <DialogTitle>Edit Image</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-          {/* Sidebar: Upload + Thumbnails */}
+          {/* Sidebar */}
           <Box sx={{ width: 160, display: "flex", flexDirection: "column", gap: 2 }}>
             <input
               ref={fileInputRef}
@@ -120,7 +117,7 @@ export default function ImageEditorModal({
               startIcon={<AddAPhoto />}
               onClick={() => fileInputRef.current?.click()}
             >
-              Bild wählen
+              Choose image
             </Button>
             <Box
               sx={{
@@ -149,7 +146,7 @@ export default function ImageEditorModal({
             </Box>
           </Box>
 
-          {/* Main Editor */}
+          {/* Cropper */}
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
             {selected || image ? (
               <Cropper
@@ -162,44 +159,45 @@ export default function ImageEditorModal({
                 background={false}
               />
             ) : (
-              <Typography variant="body2">Kein Bild geladen.</Typography>
+              <Typography variant="body2">No image loaded.</Typography>
             )}
 
             <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-              <Tooltip title="Links drehen">
+              <Tooltip title="Rotate left">
                 <IconButton onClick={() => rotate(-90)}>
                   <RotateLeft />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Rechts drehen">
+              <Tooltip title="Rotate right">
                 <IconButton onClick={() => rotate(90)}>
                   <RotateRight />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Horizontal spiegeln">
+              <Tooltip title="Flip horizontally">
                 <IconButton onClick={flipX}>
                   <Flip />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Vertikal spiegeln">
+              <Tooltip title="Flip vertically">
                 <IconButton onClick={flipY}>
                   <Flip sx={{ transform: "rotate(90deg)" }} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Vergrößern">
+              <Tooltip title="Zoom in">
                 <IconButton onClick={() => zoom(0.1)}>
                   <ZoomIn />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Verkleinern">
+              <Tooltip title="Zoom out">
                 <IconButton onClick={() => zoom(-0.1)}>
                   <ZoomOut />
                 </IconButton>
               </Tooltip>
             </Box>
+
             <TextField
               fullWidth
-              label="Bild-Beschriftung"
+              label="Image label"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
             />
@@ -207,9 +205,9 @@ export default function ImageEditorModal({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Abbrechen</Button>
+        <Button onClick={handleClose}>Cancel</Button>
         <Button onClick={handleSave} variant="contained">
-          Speichern & Hochladen
+          Save & Upload
         </Button>
       </DialogActions>
     </Dialog>

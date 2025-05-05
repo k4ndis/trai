@@ -227,6 +227,8 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
                     width: canvasData.width,
                     height: canvasData.height,
                   });
+
+                  cropper.crop();
                 
                   setOriginalSize({ width: canvasData.width, height: canvasData.height });
                   setWidth(canvasData.width);

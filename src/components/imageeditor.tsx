@@ -128,20 +128,23 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
 
   const handleResize = (type: "width" | "height", value: number) => {
     const val = isNaN(value) || value < 10 ? 10 : value;
+    const cropper = cropperRef.current?.cropper;
+    if (!cropper) return;
+  
+    const cropBox = cropper.getCropBoxData();
+  
     if (type === "width") {
+      const newHeight = locked ? Math.round(val * (originalSize.height / originalSize.width)) : height;
+      cropper.setCropBoxData({ ...cropBox, width: val, height: newHeight });
       setWidth(val);
-      if (locked && originalSize.width) {
-        const ratio = originalSize.height / originalSize.width;
-        setHeight(Math.round(val * ratio));
-      }
+      setHeight(newHeight);
     } else {
+      const newWidth = locked ? Math.round(val * (originalSize.width / originalSize.height)) : width;
+      cropper.setCropBoxData({ ...cropBox, width: newWidth, height: val });
       setHeight(val);
-      if (locked && originalSize.height) {
-        const ratio = originalSize.width / originalSize.height;
-        setWidth(Math.round(val * ratio));
-      }
+      setWidth(newWidth);
     }
-  };
+  };  
 
   const resetAll = () => {
     const cropper = cropperRef.current?.cropper;

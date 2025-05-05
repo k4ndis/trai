@@ -66,6 +66,18 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
     setHeight(canvas.height);
   }, [selected, image]);
 
+  // 👉 Vorschau-Resize live anwenden
+  useEffect(() => {
+    const cropper = cropperRef.current?.cropper;
+    if (!cropper || !width || !height) return;
+
+    const canvas = cropper.getCroppedCanvas({ width, height });
+    if (!canvas) return;
+
+    const dataUrl = canvas.toDataURL();
+    cropper.replace(dataUrl);
+  }, [width, height]);
+
   const rotate = (deg: number) => cropperRef.current?.cropper?.rotate(deg);
   const zoom = (factor: number) => cropperRef.current?.cropper?.zoom(factor);
   const flipX = () => {
@@ -125,17 +137,18 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
   };
 
   const handleResize = (type: "width" | "height", value: number) => {
+    const val = isNaN(value) || value < 10 ? 10 : value;
     if (type === "width") {
-      setWidth(value);
+      setWidth(val);
       if (locked && originalSize.width) {
         const ratio = originalSize.height / originalSize.width;
-        setHeight(Math.round(value * ratio));
+        setHeight(Math.round(val * ratio));
       }
     } else {
-      setHeight(value);
+      setHeight(val);
       if (locked && originalSize.height) {
         const ratio = originalSize.width / originalSize.height;
-        setWidth(Math.round(value * ratio));
+        setWidth(Math.round(val * ratio));
       }
     }
   };

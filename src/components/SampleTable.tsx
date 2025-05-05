@@ -20,6 +20,7 @@ import AddIcon from "@mui/icons-material/Add"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 import CameraAltIcon from "@mui/icons-material/CameraAlt"
+import Autocomplete from "@mui/material/Autocomplete"
 import { useInformationStore } from "@/lib/store"
 import { Dialog, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
 import type { Sample } from "@/lib/store"
@@ -37,10 +38,11 @@ export function SampleTable() {
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
     setActiveSample(sample ?? {
-      id: Date.now(),
+      id: samples.length > 0 ? Math.max(...samples.map(s => s.id)) + 1 : 1,
       productNumber: "",
       productionDate: "",
       serialNumber: "",
+      sampleState: "",
       features: "",
       images: [],
     })
@@ -69,15 +71,17 @@ export function SampleTable() {
   }
 
   const columns = useMemo<MRT_ColumnDef<Sample>[]>(() => [
+    { accessorKey: "id", header: "ID", enableEditing: false },
     { accessorKey: "productNumber", header: "Product Number" },
     { accessorKey: "productionDate", header: "Production Date" },
     { accessorKey: "serialNumber", header: "Serial Number" },
+    { accessorKey: "sampleState", header: "Sample State" },
     { accessorKey: "features", header: "Features" },
     {
       header: "Images",
       Cell: ({ row }) => (
         <span className="text-muted-foreground text-sm">
-          {row.original.images?.length || 0} 📷
+          {row.original.images?.length || 0}
         </span>
       ),
     },
@@ -135,6 +139,23 @@ export function SampleTable() {
             <TextField label="Product Number" value={activeSample?.productNumber ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, productNumber: e.target.value } : prev)} />
             <TextField label="Production Date" value={activeSample?.productionDate ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, productionDate: e.target.value } : prev)} />
             <TextField label="Serial Number" value={activeSample?.serialNumber ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, serialNumber: e.target.value } : prev)} />
+            <Autocomplete
+              freeSolo
+              options={["A", "B", "C", "S"]}
+              value={activeSample?.sampleState ?? ""}
+              onChange={(_, newValue) =>
+                setActiveSample((prev) => prev ? { ...prev, sampleState: newValue ?? "" } : prev)
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Sample State"
+                  onChange={(e) =>
+                    setActiveSample((prev) => prev ? { ...prev, sampleState: e.target.value } : prev)
+                  }
+                />
+              )}
+            />
             <TextField label="Features" value={activeSample?.features ?? ""} onChange={(e) => setActiveSample((prev) => prev ? { ...prev, features: e.target.value } : prev)} />
           </DialogContent>
           <DialogActions>

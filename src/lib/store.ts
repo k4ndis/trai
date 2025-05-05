@@ -33,6 +33,7 @@ export interface Sample {
   productNumber: string
   productionDate: string
   serialNumber: string
+  sampleState: string
   features: string
   images: SampleImage[]
 }
@@ -102,6 +103,7 @@ export const useInformationStore = create<InformationState>()(
               productNumber: "",
               productionDate: "",
               serialNumber: "",
+              sampleState: "",
               features: "",
               images: [],
             },

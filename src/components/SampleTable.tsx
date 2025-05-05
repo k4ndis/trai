@@ -34,8 +34,6 @@ export function SampleTable() {
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -93,9 +91,6 @@ export function SampleTable() {
     columns,
     data: samples,
     enableRowSelection: true,
-    onRowSelectionChange: (updater) => {
-      table.setRowSelection?.(updater)
-    },
     enableEditing: true,
     editDisplayMode: "modal",
     createDisplayMode: "modal",
@@ -122,25 +117,11 @@ export function SampleTable() {
         </Tooltip>
       </Box>
     ),
-    renderTopToolbarCustomActions: () => {
-      const selected = table.getSelectedRowModel().rows
-      return (
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
-            Add Sample
-          </Button>
-          {selected.length > 0 && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => setConfirmDeleteOpen(true)}
-            >
-              Delete Selection
-            </Button>
-          )}
-        </Box>
-      )
-    },    
+    renderTopToolbarCustomActions: () => (
+      <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
+        Add Sample
+      </Button>
+    ),
     muiTableContainerProps: { sx: { minHeight: "400px", borderRadius: 2 } },
   })
 
@@ -184,7 +165,7 @@ export function SampleTable() {
         </ShadDialogContent>
       </Dialog>
 
-      {/* Galerie-Dialog */}
+      {/* Galerie-Dialog mit Filerobot */}
       {imageGallerySample && (
         <ImageGalleryDialog
           sample={imageGallerySample}
@@ -201,28 +182,6 @@ export function SampleTable() {
           }}          
         />
       )}
-
-      {/* Bestätigungsdialog für Mehrfach-Löschung */}
-      <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
-        <DialogTitle>Delete selected samples?</DialogTitle>
-        <DialogContent>
-          This will permanently delete {table.getSelectedRowModel().rows.length} sample(s).
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              const idsToDelete = table.getSelectedRowModel().rows.map(r => Number(r.original.id))
-              setSamples(samples.filter(s => !idsToDelete.includes(s.id)))
-              setConfirmDeleteOpen(false)
-            }}
-            color="error"
-            variant="contained"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   )
 }

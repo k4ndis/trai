@@ -71,7 +71,7 @@ export function SampleTable() {
   }
 
   const columns = useMemo<MRT_ColumnDef<Sample>[]>(() => [
-    { accessorKey: "id", header: "ID", enableEditing: false },
+    { accessorKey: "id", header: "ID", enableEditing: false, size: 50, },
     { accessorKey: "productNumber", header: "Product Number" },
     { accessorKey: "productionDate", header: "Production Date" },
     { accessorKey: "serialNumber", header: "Serial Number" },

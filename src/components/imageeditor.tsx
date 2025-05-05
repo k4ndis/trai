@@ -19,6 +19,8 @@ import {
   Slider,
   InputAdornment,
   Input,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   RotateLeft,
@@ -30,7 +32,17 @@ import {
   Lock,
   LockOpen,
   RestartAlt,
+  CenterFocusStrong,
 } from "@mui/icons-material";
+
+const presets = [
+  { label: "1:1", ratio: 1 },
+  { label: "16:9", ratio: 16 / 9 },
+  { label: "A4 Portrait", ratio: 210 / 297 },
+  { label: "A4 Landscape", ratio: 297 / 210 },
+  { label: "Free", ratio: 0 },
+];
+
 
 type ImageEditorModalProps = {
   open: boolean;
@@ -52,6 +64,9 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [locked, setLocked] = useState(true);
+  const [cropPos, setCropPos] = useState({ x: 0, y: 0 });
+  const [presetRatio, setPresetRatio] = useState(1);
+
 
   const [localImages, setLocalImages] = useState<string[]>([]);
   const [selected, setSelected] = useState<string>("");
@@ -80,6 +95,24 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
     cropperRef.current?.cropper?.scaleY(newY);
     setScaleY(newY);
   };
+
+  const handlePresetChange = (value: number) => {
+    setPresetRatio(value);
+    const cropper = cropperRef.current?.cropper;
+    if (!cropper) return;
+    cropper.setAspectRatio(value);
+  };
+  
+  const centerCropBox = () => {
+    const cropper = cropperRef.current?.cropper;
+    if (!cropper) return;
+    const container = cropper.getContainerData();
+    const cropBox = cropper.getCropBoxData();
+    const newLeft = (container.width - cropBox.width) / 2;
+    const newTop = (container.height - cropBox.height) / 2;
+    cropper.setCropBoxData({ ...cropBox, left: newLeft, top: newTop });
+    setCropPos({ x: Math.round(newLeft), y: Math.round(newTop) });
+  };  
 
   const handleSave = async () => {
     const cropper = cropperRef.current?.cropper;
@@ -132,6 +165,9 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
     if (!cropper) return;
   
     const cropBox = cropper.getCropBoxData();
+
+    const newBox = cropper.getCropBoxData();
+    setCropPos({ x: Math.round(newBox.left), y: Math.round(newBox.top) });
   
     if (type === "width") {
       const newHeight = locked ? Math.round(val * (originalSize.height / originalSize.width)) : height;
@@ -229,7 +265,8 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
                   });
 
                   cropper.crop();
-                
+
+                  setCropPos({ x: canvasData.left, y: canvasData.top });                
                   setOriginalSize({ width: canvasData.width, height: canvasData.height });
                   setWidth(canvasData.width);
                   setHeight(canvasData.height);
@@ -249,11 +286,24 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
               <Tooltip title="Flip vertically"><IconButton onClick={flipY}><Flip sx={{ transform: "rotate(90deg)" }} /></IconButton></Tooltip>
               <Tooltip title="Zoom in"><IconButton onClick={() => zoom(0.1)}><ZoomIn /></IconButton></Tooltip>
               <Tooltip title="Zoom out"><IconButton onClick={() => zoom(-0.1)}><ZoomOut /></IconButton></Tooltip>
+              <Tooltip title="Center crop box">
+                <IconButton onClick={centerCropBox}><CenterFocusStrong /></IconButton>
+              </Tooltip>
               <Tooltip title="Reset all">
                 <IconButton onClick={resetAll}><RestartAlt /></IconButton>
               </Tooltip>
             </Box>
-
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center", mt: 1 }}>
+              <Typography variant="body2">Crop Preset:</Typography>
+              <Select size="small" value={presetRatio} onChange={(e) => handlePresetChange(Number(e.target.value))}>
+                {presets.map((p) => (
+                  <MenuItem key={p.label} value={p.ratio}>{p.label}</MenuItem>
+                ))}
+              </Select>
+              <Typography variant="body2" sx={{ ml: "auto" }}>
+                X: {cropPos.x}px &nbsp; Y: {cropPos.y}px &nbsp; W: {width}px &nbsp; H: {height}px
+              </Typography>
+            </Box>
             <Typography variant="subtitle2">Finetune</Typography>
             <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
               <Typography variant="body2">Brightness</Typography>

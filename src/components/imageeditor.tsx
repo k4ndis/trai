@@ -214,19 +214,24 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
                 ready={() => {
                   const cropper = cropperRef.current?.cropper;
                   if (!cropper) return;
-                  cropper.setDragMode("move");
-                  cropper.clear();
+                
+                  cropper.clear();               // CropBox zurücksetzen
+                  cropper.setDragMode("move");   // Beweglich machen
+                  cropper.enable();              // Sicherheitsmaßnahme in neueren Versionen
+                
                   const canvasData = cropper.getCanvasData();
+                
                   cropper.setCropBoxData({
                     left: canvasData.left,
                     top: canvasData.top,
                     width: canvasData.width,
                     height: canvasData.height,
                   });
+                
                   setOriginalSize({ width: canvasData.width, height: canvasData.height });
                   setWidth(canvasData.width);
                   setHeight(canvasData.height);
-                }}
+                }}                
                 ref={cropperRef}
                 guides={true}
                 background={false}

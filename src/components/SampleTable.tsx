@@ -71,9 +71,28 @@ function SampleTableInner() {
   }
 
   const handleDelete = (id: number) => {
-    const confirm = window.confirm("Are you sure you want to delete this sample?")
-    if (confirm) setSamples(samples.filter((s) => s.id !== id))
+    setBackupSamples(samples)
+    const updated = samples.filter((s) => s.id !== id)
+    setSamples(updated)
+    enqueueSnackbar("Sample deleted", {
+      action: () => (
+        <Button
+          color="inherit"
+          size="small"
+          onClick={() => {
+            if (backupSamples) {
+              setSamples(backupSamples)
+              setBackupSamples(null)
+              enqueueSnackbar("Undo successful", { variant: "success" })
+            }
+          }}
+        >
+          UNDO
+        </Button>
+      ),
+    })
   }
+  
 
   const columns = useMemo<MRT_ColumnDef<Sample>[]>(() => [
     {

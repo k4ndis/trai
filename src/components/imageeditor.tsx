@@ -1,4 +1,4 @@
-// Fully updated Image Editor with Resize, Brightness, Contrast, and proper onReady handling
+// Fully updated Image Editor with full-image crop, correct dimensions, and total reset button
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
@@ -29,7 +29,7 @@ import {
   AddAPhoto,
   Lock,
   LockOpen,
-  Restore,
+  RestartAlt,
 } from "@mui/icons-material";
 
 type ImageEditorModalProps = {
@@ -56,18 +56,17 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
   const [localImages, setLocalImages] = useState<string[]>([]);
   const [selected, setSelected] = useState<string>("");
 
-  // Vorschau-Resize live anwenden
+  // Vorschau-Resize live anwenden (nicht ersetzen, sondern nur CropBox setzen)
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
     if (!cropper || !width || !height) return;
-  
     const cropBoxData = cropper.getCropBoxData();
     cropper.setCropBoxData({
       ...cropBoxData,
       width,
       height,
     });
-  }, [width, height]);  
+  }, [width, height]);
 
   const rotate = (deg: number) => cropperRef.current?.cropper?.rotate(deg);
   const zoom = (factor: number) => cropperRef.current?.cropper?.zoom(factor);
@@ -144,7 +143,22 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
     }
   };
 
-  const resetSize = () => {
+  const resetAll = () => {
+    const cropper = cropperRef.current?.cropper;
+    if (!cropper) return;
+    cropper.reset();
+    cropper.setDragMode("move");
+    const containerData = cropper.getContainerData();
+    cropper.setCropBoxData({
+      left: 0,
+      top: 0,
+      width: containerData.width,
+      height: containerData.height,
+    });
+    setScaleX(1);
+    setScaleY(1);
+    setBrightness(1);
+    setContrast(1);
     setWidth(originalSize.width);
     setHeight(originalSize.height);
   };
@@ -189,24 +203,31 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
             {selected || image ? (
               <Cropper
-              src={selected || image}
-              style={{ height: 400, width: "100%", filter: `brightness(${brightness}) contrast(${contrast})` }}
-              initialAspectRatio={1}
-              viewMode={1}
-              autoCropArea={0.8}
-              ready={() => {
-                const cropper = cropperRef.current?.cropper;
-                if (!cropper) return;
-                cropper.setDragMode("move"); // optional: erlaubt Bildverschiebung
-                const cropBoxData = cropper.getCropBoxData();
-                setOriginalSize({ width: cropBoxData.width, height: cropBoxData.height });
-                setWidth(cropBoxData.width);
-                setHeight(cropBoxData.height);
-              }}
-              ref={cropperRef}
-              guides={true}
-              background={false}
-            />            
+                src={selected || image}
+                style={{ height: 400, width: "100%", filter: `brightness(${brightness}) contrast(${contrast})` }}
+                initialAspectRatio={1}
+                viewMode={1}
+                autoCropArea={1}
+                ready={() => {
+                  const cropper = cropperRef.current?.cropper;
+                  if (!cropper) return;
+                  cropper.setDragMode("move");
+                  cropper.clear();
+                  const canvasData = cropper.getCanvasData();
+                  cropper.setCropBoxData({
+                    left: canvasData.left,
+                    top: canvasData.top,
+                    width: canvasData.width,
+                    height: canvasData.height,
+                  });
+                  setOriginalSize({ width: canvasData.width, height: canvasData.height });
+                  setWidth(canvasData.width);
+                  setHeight(canvasData.height);
+                }}
+                ref={cropperRef}
+                guides={true}
+                background={false}
+              />
             ) : (
               <Typography variant="body2">No image loaded.</Typography>
             )}
@@ -218,6 +239,9 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
               <Tooltip title="Flip vertically"><IconButton onClick={flipY}><Flip sx={{ transform: "rotate(90deg)" }} /></IconButton></Tooltip>
               <Tooltip title="Zoom in"><IconButton onClick={() => zoom(0.1)}><ZoomIn /></IconButton></Tooltip>
               <Tooltip title="Zoom out"><IconButton onClick={() => zoom(-0.1)}><ZoomOut /></IconButton></Tooltip>
+              <Tooltip title="Reset all">
+                <IconButton onClick={resetAll}><RestartAlt /></IconButton>
+              </Tooltip>
             </Box>
 
             <Typography variant="subtitle2">Finetune</Typography>
@@ -234,20 +258,17 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               <Input
                 value={width}
-                onChange={(e) => handleResize("width", parseInt(e.target.value))}
+                onChange={(e) => handleResize("width", parseFloat(e.target.value))}
                 endAdornment={<InputAdornment position="end">px</InputAdornment>}
                 type="number"
               />
               <IconButton onClick={() => setLocked(!locked)}>{locked ? <Lock /> : <LockOpen />}</IconButton>
               <Input
                 value={height}
-                onChange={(e) => handleResize("height", parseInt(e.target.value))}
+                onChange={(e) => handleResize("height", parseFloat(e.target.value))}
                 endAdornment={<InputAdornment position="end">px</InputAdornment>}
                 type="number"
               />
-              <Tooltip title="Reset size">
-                <IconButton onClick={resetSize}><Restore /></IconButton>
-              </Tooltip>
             </Box>
 
             <TextField

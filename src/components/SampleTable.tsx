@@ -34,6 +34,7 @@ export function SampleTable() {
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -123,11 +124,25 @@ export function SampleTable() {
         </Tooltip>
       </Box>
     ),
-    renderTopToolbarCustomActions: () => (
-      <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
-        Add Sample
-      </Button>
-    ),
+    renderTopToolbarCustomActions: ({ table }) => {
+      const selected = table.getSelectedRowModel().rows
+      return (
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
+            Add Sample
+          </Button>
+          {selected.length > 0 && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setConfirmDeleteOpen(true)}
+            >
+              Delete Selection
+            </Button>
+          )}
+        </Box>
+      )
+    },    
     muiTableContainerProps: { sx: { minHeight: "400px", borderRadius: 2 } },
   })
 
@@ -188,6 +203,28 @@ export function SampleTable() {
           }}          
         />
       )}
+
+      <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <DialogTitle>Delete selected samples?</DialogTitle>
+        <DialogContent>
+          This will permanently delete {table.getSelectedRowModel().rows.length} sample(s).
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              const idsToDelete = table.getSelectedRowModel().rows.map(r => r.original.id)
+              setSamples(samples.filter(s => !idsToDelete.includes(s.id)))
+              setConfirmDeleteOpen(false)
+            }}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </>
   )
 }

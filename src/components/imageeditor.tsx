@@ -60,13 +60,14 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
     if (!cropper || !width || !height) return;
-
-    const canvas = cropper.getCroppedCanvas({ width, height });
-    if (!canvas) return;
-
-    const dataUrl = canvas.toDataURL();
-    cropper.replace(dataUrl);
-  }, [width, height]);
+  
+    const cropBoxData = cropper.getCropBoxData();
+    cropper.setCropBoxData({
+      ...cropBoxData,
+      width,
+      height,
+    });
+  }, [width, height]);  
 
   const rotate = (deg: number) => cropperRef.current?.cropper?.rotate(deg);
   const zoom = (factor: number) => cropperRef.current?.cropper?.zoom(factor);
@@ -188,25 +189,24 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
             {selected || image ? (
               <Cropper
-                src={selected || image}
-                style={{ height: 400, width: "100%", filter: `brightness(${brightness}) contrast(${contrast})` }}
-                initialAspectRatio={1}
-                autoCropArea={1}
-                viewMode={0}
-                ready={() => {
-                  const cropper = cropperRef.current?.cropper;
-                  if (!cropper) return;
-                  const canvas = cropper.getCroppedCanvas();
-                  if (!canvas) return;
-                  setOriginalSize({ width: canvas.width, height: canvas.height });
-                  setWidth(canvas.width);
-                  setHeight(canvas.height);
-                  cropper.reset();
-                }}                
-                ref={cropperRef}
-                guides={true}
-                background={false}
-              />
+              src={selected || image}
+              style={{ height: 400, width: "100%", filter: `brightness(${brightness}) contrast(${contrast})` }}
+              initialAspectRatio={1}
+              viewMode={1}
+              autoCropArea={0.8}
+              ready={() => {
+                const cropper = cropperRef.current?.cropper;
+                if (!cropper) return;
+                cropper.setDragMode("move"); // optional: erlaubt Bildverschiebung
+                const cropBoxData = cropper.getCropBoxData();
+                setOriginalSize({ width: cropBoxData.width, height: cropBoxData.height });
+                setWidth(cropBoxData.width);
+                setHeight(cropBoxData.height);
+              }}
+              ref={cropperRef}
+              guides={true}
+              background={false}
+            />            
             ) : (
               <Typography variant="body2">No image loaded.</Typography>
             )}

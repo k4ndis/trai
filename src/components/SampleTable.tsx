@@ -25,8 +25,9 @@ import { useInformationStore } from "@/lib/store"
 import { Dialog, DialogContent as ShadDialogContent } from "@/components/ui/dialog"
 import type { Sample } from "@/lib/store"
 import ImageGalleryDialog from "@/components/ImageGalleryDialog"
+import { SnackbarProvider, useSnackbar } from "notistack"
 
-export function SampleTable() {
+function SampleTableInner() {
   const samples = useInformationStore((state) => state.samples)
   const setSamples = useInformationStore((state) => state.setSamples)
 
@@ -34,7 +35,10 @@ export function SampleTable() {
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false) // 🆕
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [backupSamples, setBackupSamples] = useState<Sample[] | null>(null)
+
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -197,9 +201,28 @@ export function SampleTable() {
               onClick={() => {
                 const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
                 const updated = samples.filter((s) => !idsToDelete.includes(s.id))
+                setBackupSamples(samples)
                 setSamples(updated)
                 setConfirmDeleteOpen(false)
                 table.resetRowSelection()
+
+                enqueueSnackbar(`${idsToDelete.length} sample(s) deleted`, {
+                  action: () => (
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={() => {
+                        if (backupSamples) {
+                          setSamples(backupSamples)
+                          setBackupSamples(null)
+                          enqueueSnackbar("Undo successful", { variant: "success" })
+                        }
+                      }}
+                    >
+                      UNDO
+                    </Button>
+                  ),
+                })
               }}
             >
               Delete
@@ -225,5 +248,13 @@ export function SampleTable() {
         />
       )}
     </>
+  )
+}
+
+export function SampleTable() {
+  return (
+    <SnackbarProvider maxSnack={3}>
+      <SampleTableInner />
+    </SnackbarProvider>
   )
 }

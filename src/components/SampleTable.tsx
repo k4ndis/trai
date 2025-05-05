@@ -34,6 +34,7 @@ export function SampleTable() {
   const [activeSample, setActiveSample] = useState<Sample | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false) // 🆕
 
   const handleOpenModal = (mode: "create" | "edit", sample?: Sample) => {
     setModalMode(mode)
@@ -123,11 +124,21 @@ export function SampleTable() {
         </Tooltip>
       </Box>
     ),
-    renderTopToolbarCustomActions: () => (
-      <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
-        Add Sample
-      </Button>
-    ),
+    renderTopToolbarCustomActions: ({ table }) => {
+      const selected = table.getSelectedRowModel().rows
+      return (
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal("create")}>
+            Add Sample
+          </Button>
+          {selected.length > 0 && (
+            <Button variant="outlined" color="error" onClick={() => setConfirmDeleteOpen(true)}>
+              Delete Selection
+            </Button>
+          )}
+        </Box>
+      )
+    },
     muiTableContainerProps: { sx: { minHeight: "400px", borderRadius: 2 } },
   })
 
@@ -171,7 +182,33 @@ export function SampleTable() {
         </ShadDialogContent>
       </Dialog>
 
-      {/* Galerie-Dialog mit Filerobot */}
+      {/* Delete Selection Confirmation */}
+      <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <ShadDialogContent className="max-w-md">
+          <DialogTitle>Delete selected samples?</DialogTitle>
+          <DialogContent>
+            This will permanently delete {table.getSelectedRowModel().rows.length} sample(s).
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
+            <Button
+              color="error"
+              variant="contained"
+              onClick={() => {
+                const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
+                const updated = samples.filter((s) => !idsToDelete.includes(s.id))
+                setSamples(updated)
+                setConfirmDeleteOpen(false)
+                table.resetRowSelection()
+              }}
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </ShadDialogContent>
+      </Dialog>
+
+      {/* Galerie-Dialog */}
       {imageGallerySample && (
         <ImageGalleryDialog
           sample={imageGallerySample}
@@ -181,11 +218,10 @@ export function SampleTable() {
             setSamples(samples.map((s) =>
               s.id === updated.id ? { ...s, images: updated.images ?? [] } : s
             ))
-            
             setImageGallerySample((prev) =>
               prev ? { ...prev, images: updated.images ?? [] } : null
-            )            
-          }}          
+            )
+          }}
         />
       )}
     </>

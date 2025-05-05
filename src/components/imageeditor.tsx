@@ -1,4 +1,4 @@
-// Fully updated Image Editor with Resize, Brightness, Contrast, and safety checks
+// Fully updated Image Editor with Resize, Brightness, Contrast, and proper onReady handling
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
@@ -56,17 +56,7 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
   const [localImages, setLocalImages] = useState<string[]>([]);
   const [selected, setSelected] = useState<string>("");
 
-  useEffect(() => {
-    const cropper = cropperRef.current?.cropper;
-    if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas();
-    if (!canvas) return;
-    setOriginalSize({ width: canvas.width, height: canvas.height });
-    setWidth(canvas.width);
-    setHeight(canvas.height);
-  }, [selected, image]);
-
-  // 👉 Vorschau-Resize live anwenden
+  // Vorschau-Resize live anwenden
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
     if (!cropper || !width || !height) return;
@@ -201,9 +191,20 @@ export default function ImageEditorModal({ open, image, onClose, onSave }: Image
                 src={selected || image}
                 style={{ height: 400, width: "100%", filter: `brightness(${brightness}) contrast(${contrast})` }}
                 initialAspectRatio={1}
-                guides={true}
+                autoCropArea={1}
+                viewMode={0}
+                ready={() => {
+                  const cropper = cropperRef.current?.cropper;
+                  if (!cropper) return;
+                  const canvas = cropper.getCroppedCanvas();
+                  if (!canvas) return;
+                  setOriginalSize({ width: canvas.width, height: canvas.height });
+                  setWidth(canvas.width);
+                  setHeight(canvas.height);
+                  cropper.reset();
+                }}                
                 ref={cropperRef}
-                viewMode={1}
+                guides={true}
                 background={false}
               />
             ) : (

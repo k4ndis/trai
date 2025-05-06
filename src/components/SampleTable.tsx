@@ -36,7 +36,6 @@ function SampleTableInner() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-  const [backupSamples, setBackupSamples] = useState<Sample[] | null>(null)
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null)
 
   const { enqueueSnackbar } = useSnackbar()
@@ -71,30 +70,6 @@ function SampleTableInner() {
     handleCloseModal()
   }
 
-  const handleDelete = (id: number) => {
-    setBackupSamples(samples)
-    const updated = samples.filter((s) => s.id !== id)
-    setSamples(updated)
-    enqueueSnackbar("Sample deleted", {
-      action: () => (
-        <Button
-          color="inherit"
-          size="small"
-          onClick={() => {
-            if (backupSamples) {
-              setSamples(backupSamples)
-              setBackupSamples(null)
-              enqueueSnackbar("Undo successful", { variant: "success" })
-            }
-          }}
-        >
-          UNDO
-        </Button>
-      ),
-    })
-  }
-  
-
   const columns = useMemo<MRT_ColumnDef<Sample>[]>(() => [
     {
       header: "ID",
@@ -102,7 +77,7 @@ function SampleTableInner() {
       enableSorting: false,
       enableColumnFilter: false,
       size: 50,
-    },    
+    },
     { accessorKey: "productNumber", header: "Product Number" },
     { accessorKey: "productionDate", header: "Production Date" },
     { accessorKey: "serialNumber", header: "Serial Number" },
@@ -129,19 +104,18 @@ function SampleTableInner() {
     renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex", gap: "0.5rem" }}>
         <Tooltip title="Edit">
-        <IconButton
-          color="error"
-          onClick={() => {
-            setDeleteTargetId(row.original.id)
-            setConfirmDeleteOpen(true)
-          }}
-        >
-          <DeleteIcon />
-        </IconButton>
-
+          <IconButton onClick={() => handleOpenModal("edit", row.original)}>
+            <EditIcon />
+          </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
-          <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
+          <IconButton
+            color="error"
+            onClick={() => {
+              setDeleteTargetId(row.original.id)
+              setConfirmDeleteOpen(true)
+            }}
+          >
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -163,7 +137,14 @@ function SampleTableInner() {
             Add Sample
           </Button>
           {selected.length > 0 && (
-            <Button variant="outlined" color="error" onClick={() => setConfirmDeleteOpen(true)}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                setDeleteTargetId(null)
+                setConfirmDeleteOpen(true)
+              }}
+            >
               Delete Selection
             </Button>
           )}
@@ -213,12 +194,19 @@ function SampleTableInner() {
         </ShadDialogContent>
       </Dialog>
 
-      {/* Delete Selection Confirmation */}
+      {/* Delete Confirmation */}
       <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <ShadDialogContent className="max-w-md">
-          <DialogTitle>Delete selected samples?</DialogTitle>
+          <DialogTitle>
+            {deleteTargetId !== null
+              ? "Delete this sample?"
+              : `Delete selected samples?`}
+          </DialogTitle>
           <DialogContent>
-            This will permanently delete {table.getSelectedRowModel().rows.length} sample(s).
+            This will permanently delete{" "}
+            {deleteTargetId !== null
+              ? "this sample"
+              : `${table.getSelectedRowModel().rows.length} sample(s)`}.
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
@@ -232,28 +220,13 @@ function SampleTableInner() {
                     : table.getSelectedRowModel().rows.map((r) => r.original.id)
 
                 const updated = samples.filter((s) => !idsToDelete.includes(s.id))
-                setBackupSamples(samples)
                 setSamples(updated)
                 setConfirmDeleteOpen(false)
                 setDeleteTargetId(null)
                 table.resetRowSelection()
 
                 enqueueSnackbar(`${idsToDelete.length} sample(s) deleted`, {
-                  action: () => (
-                    <Button
-                      color="inherit"
-                      size="small"
-                      onClick={() => {
-                        if (backupSamples) {
-                          setSamples(backupSamples)
-                          setBackupSamples(null)
-                          enqueueSnackbar("Undo successful", { variant: "success" })
-                        }
-                      }}
-                    >
-                      UNDO
-                    </Button>
-                  ),
+                  variant: "success",
                 })
               }}
             >

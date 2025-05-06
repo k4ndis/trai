@@ -37,6 +37,7 @@ function SampleTableInner() {
   const [imageGallerySample, setImageGallerySample] = useState<Sample | null>(null)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [backupSamples, setBackupSamples] = useState<Sample[] | null>(null)
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null)
 
   const { enqueueSnackbar } = useSnackbar()
 
@@ -128,9 +129,16 @@ function SampleTableInner() {
     renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex", gap: "0.5rem" }}>
         <Tooltip title="Edit">
-          <IconButton onClick={() => handleOpenModal("edit", row.original)}>
-            <EditIcon />
-          </IconButton>
+        <IconButton
+          color="error"
+          onClick={() => {
+            setDeleteTargetId(row.original.id)
+            setConfirmDeleteOpen(true)
+          }}
+        >
+          <DeleteIcon />
+        </IconButton>
+
         </Tooltip>
         <Tooltip title="Delete">
           <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
@@ -218,11 +226,16 @@ function SampleTableInner() {
               color="error"
               variant="contained"
               onClick={() => {
-                const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
+                const idsToDelete =
+                  deleteTargetId !== null
+                    ? [deleteTargetId]
+                    : table.getSelectedRowModel().rows.map((r) => r.original.id)
+
                 const updated = samples.filter((s) => !idsToDelete.includes(s.id))
                 setBackupSamples(samples)
                 setSamples(updated)
                 setConfirmDeleteOpen(false)
+                setDeleteTargetId(null)
                 table.resetRowSelection()
 
                 enqueueSnackbar(`${idsToDelete.length} sample(s) deleted`, {

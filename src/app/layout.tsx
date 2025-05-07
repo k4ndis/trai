@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <MuiThemeWrapper>
             <div className="flex flex-col min-h-screen">
               <div className="fixed top-0 left-0 right-0 z-20">
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
               <div className="md:flex pt-14 h-screen">
                 <Sidebar />
-                <main className="w-full md:ml-64 flex-1 overflow-y-auto p-6">
+                <main className="w-full md:pl-20 flex-1 overflow-y-auto p-6">
                   {children}
                 </main>
               </div>

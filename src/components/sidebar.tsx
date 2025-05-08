@@ -47,8 +47,7 @@ export function Sidebar() {
         onMouseLeave={() => setCollapsed(true)}
         className={`${collapsed ? "w-20" : "w-64"} h-screen fixed top-14 left-0 z-10 border-r bg-muted/40 transition-all duration-300 overflow-y-auto p-4 hidden md:block`}
       >
-        <SidebarContent
-          activeField={activeField}
+        <SidebarContent          
           router={router}
           pathname={pathname}
           collapsed={collapsed}
@@ -64,8 +63,7 @@ export function Sidebar() {
             className="w-64 h-full bg-background border-r p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <SidebarContent
-              activeField={activeField}
+            <SidebarContent              
               router={router}
               pathname={pathname}
               collapsed={false}
@@ -77,13 +75,11 @@ export function Sidebar() {
   )
 }
 
-function SidebarContent({
-  activeField,
+function SidebarContent({  
   router,
   pathname,
   collapsed,
-}: {
-  activeField: string | null
+}: {  
   router: ReturnType<typeof useRouter>
   pathname: string
   collapsed: boolean

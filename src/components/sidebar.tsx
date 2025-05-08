@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useUIStore } from "@/lib/store"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import {
   House,
   Boxes,

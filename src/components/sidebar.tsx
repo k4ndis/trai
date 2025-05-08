@@ -25,21 +25,10 @@ const sections = [
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()
-  const [activeField, setActiveField] = useState<string | null>(null)
+  const { isMobileSidebarOpen, closeMobileSidebar } = useUIStore()  
   const [collapsed, setCollapsed] = useState(true)
 
-  useEffect(() => {
-    const handle = () => {
-      const activeEl = document.activeElement as HTMLElement | null
-      if (activeEl?.id) {
-        setActiveField(activeEl.id)
-      }
-    }
-    window.addEventListener("focusin", handle)
-    return () => window.removeEventListener("focusin", handle)
-  }, [])
-
+  
   return (
     <>
       <aside

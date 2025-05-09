@@ -13,7 +13,6 @@ import {
   TextField,  
   Checkbox,
   FormControlLabel,
-  Grid,
 } from "@mui/material"
 import { useState } from "react"
 import { useInformationStore } from "@/lib/store"
@@ -39,42 +38,26 @@ export default function ReportModal({ onClose }: { onClose: () => void }) {
     switch (activeStep) {
       case 0:
         return (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Report" value={fields.report || ""} onChange={(e) => updateField("report", e.target.value)} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Project" value={fields.project || ""} onChange={(e) => updateField("project", e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Product" value={fields.product || ""} onChange={(e) => updateField("product", e.target.value)} />
-            </Grid>
-          </Grid>
+          <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TextField fullWidth label="Report" value={fields.report || ""} onChange={(e) => updateField("report", e.target.value)} />
+            <TextField fullWidth label="Project" value={fields.project || ""} onChange={(e) => updateField("project", e.target.value)} />
+            <TextField fullWidth label="Product" value={fields.product || ""} onChange={(e) => updateField("product", e.target.value)} className="sm:col-span-2" />
+          </Box>
         )
       case 1:
         return (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Product Number" value={fields.productnumber || ""} onChange={(e) => updateField("productnumber", e.target.value)} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Drawing" value={fields.drawing || ""} onChange={(e) => updateField("drawing", e.target.value)} />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="DVP" value={fields.dvp || ""} onChange={(e) => updateField("dvp", e.target.value)} />
-            </Grid>
-          </Grid>
+          <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TextField fullWidth label="Product Number" value={fields.productnumber || ""} onChange={(e) => updateField("productnumber", e.target.value)} />
+            <TextField fullWidth label="Drawing" value={fields.drawing || ""} onChange={(e) => updateField("drawing", e.target.value)} />
+            <TextField fullWidth label="DVP" value={fields.dvp || ""} onChange={(e) => updateField("dvp", e.target.value)} className="sm:col-span-2" />
+          </Box>
         )
       case 2:
         return (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Test" value={fields.test || ""} onChange={(e) => updateField("test", e.target.value)} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Result" value={fields.result || ""} onChange={(e) => updateField("result", e.target.value)} />
-            </Grid>
-          </Grid>
+          <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TextField fullWidth label="Test" value={fields.test || ""} onChange={(e) => updateField("test", e.target.value)} />
+            <TextField fullWidth label="Result" value={fields.result || ""} onChange={(e) => updateField("result", e.target.value)} />
+          </Box>
         )
       case 3:
         return (

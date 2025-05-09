@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Dialog,
-  Grid,
   Step,
   StepLabel,
   Stepper,
@@ -57,30 +56,29 @@ export default function OverviewPage() {
         ))}
       </Stepper>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6} lg={4}>
-          <Card
-            sx={{ bgcolor: "grey.900", color: "white", cursor: "pointer" }}
-            onClick={() => setModalOpen(true)}
-          >
+      <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Box onClick={() => setModalOpen(true)} className="cursor-pointer">
+          <Card sx={{ bgcolor: "grey.900", color: "white" }}>
             <CardContent>
               <Typography variant="h6">Report Info</Typography>
-              <Typography variant="body2" mt={1}>{fields.report || "Click to enter report data"}</Typography>
+              <Typography variant="body2" mt={1}>
+                {fields.report || "Click to enter report data"}
+              </Typography>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {sections.map((section) => (
-          <Grid item xs={12} md={6} lg={4} key={section.title}>
-            <Card sx={{ cursor: "pointer" }} onClick={() => router.push(section.link)}>
+          <Box key={section.title} onClick={() => router.push(section.link)} className="cursor-pointer">
+            <Card>
               <CardContent>
                 <Typography variant="h6">{section.title}</Typography>
                 <Typography variant="body2" mt={1}>{section.preview}</Typography>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md" fullWidth>
         <ReportModal onClose={() => setModalOpen(false)} />

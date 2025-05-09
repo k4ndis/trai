@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useInformationStore } from "@/lib/store"
 import ReportModal from "@/components/ReportModal"
+import { Container } from "@/components/container"
 
 export default function OverviewPage() {
   const router = useRouter()
@@ -43,7 +44,7 @@ export default function OverviewPage() {
   ]
 
   return (
-    <Box p={4}>
+    <Container className="space-y-6">
       <Typography variant="h4" gutterBottom>
         Test Report Overview
       </Typography>
@@ -83,6 +84,6 @@ export default function OverviewPage() {
       <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md" fullWidth>
         <ReportModal onClose={() => setModalOpen(false)} />
       </Dialog>
-    </Box>
+    </Container>
   )
 }

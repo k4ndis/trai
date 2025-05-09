@@ -22,18 +22,36 @@ export default function OverviewPage() {
   const fields = useInformationStore((state) => state.fields)
   const [modalOpen, setModalOpen] = useState(false)
 
-  const requiredFields = [
-    "report",
-    "project",
-    "product",
-    "productnumber",
-    "drawing",
-    "dvp",
-    "test",
-    "result",
+  const steps = [
+    { key: "report", label: "Report Info" },
+    { key: "samples", label: "Samples" },
+    { key: "procedure", label: "Procedure" },
+    { key: "evaluation", label: "Evaluation" },
+    { key: "results", label: "Results" },
+    { key: "review", label: "Review" },
   ]
 
-  const completed = requiredFields.filter((key) => fields[key])
+  // Simpler Completion Checker (nur einige Felder aktiv aktuell)
+  const isStepCompleted = (key: string): boolean => {
+    switch (key) {
+      case "report":
+        return !!fields.report
+      case "samples":
+        return false // TODO: später mit Zustand oder fields.samples.length > 0 ersetzen
+      case "procedure":
+        return !!fields.testtype
+      case "evaluation":
+        return false // TODO: später mit evaluation-Feld ersetzen
+      case "results":
+        return !!fields.result // falls du später result speicherst
+      case "review":
+        return false // TODO: später mit review-Feld ersetzen
+      default:
+        return false
+    }
+  }
+
+  const activeStepIndex = steps.findIndex((step) => !isStepCompleted(step.key))
 
   const sections = [
     { title: "Samples", preview: "Sample previews", link: "/testsamples" },
@@ -45,14 +63,10 @@ export default function OverviewPage() {
 
   return (
     <Container className="space-y-6">
-      <Typography variant="h4" gutterBottom>
-        Test Report Overview
-      </Typography>
-
-      <Stepper activeStep={completed.length} alternativeLabel sx={{ my: 4 }}>
-        {requiredFields.map((field) => (
-          <Step key={field} completed={Boolean(fields[field])}>
-            <StepLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</StepLabel>
+      <Stepper activeStep={activeStepIndex} alternativeLabel sx={{ my: 2 }}>
+        {steps.map((step) => (
+          <Step key={step.key} completed={isStepCompleted(step.key)}>
+            <StepLabel>{step.label}</StepLabel>
           </Step>
         ))}
       </Stepper>
@@ -87,3 +101,4 @@ export default function OverviewPage() {
     </Container>
   )
 }
+

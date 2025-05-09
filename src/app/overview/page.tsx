@@ -50,7 +50,7 @@ export default function OverviewPage() {
       </Typography>
 
       <Stepper activeStep={completed.length} alternativeLabel sx={{ my: 4 }}>
-        {requiredFields.map((field, index) => (
+        {requiredFields.map((field) => (
           <Step key={field} completed={Boolean(fields[field])}>
             <StepLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</StepLabel>
           </Step>
